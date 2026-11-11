@@ -1,0 +1,1063 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NPA Invoice Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* National Ploughing Championships green and gold, as in the NPA admin wireframes */
+  --brand-950:#0a2b19; --brand-900:#0f3d24; --brand-800:#155232; --brand-700:#1c6b40; --brand-600:#25854f; --brand-500:#2f9a5c;
+  --brand-100:#e3f2e8; --brand-50:#f1f8f3;
+  --amber:#f0b429; --amber-50:#fff6dc;
+  --bg:#f4f6f3; --card:#fff; --line:#e1e6e1; --line-2:#eef1ee;
+  --text:#17221b; --muted:#5f6d63; --dim:#8b978e;
+  --green:#14935a; --green-50:#e5f6ed; --red:#d6453d; --red-50:#fdecea; --orange:#d97a12; --orange-50:#fff1e0;
+  --blue:#2a7598; --blue-50:#e5f0f6; --grey-50:#eef1ee;
+  --r:12px; --shadow:0 1px 2px rgba(16,40,24,.06),0 2px 8px rgba(16,40,24,.04);
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--text);font:14px/1.45 Inter,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;min-width:1100px}
+body.landing{min-width:0}
+button,input,select,textarea{font:inherit;color:inherit}
+a{color:var(--brand-600);text-decoration:none}
+a:hover{text-decoration:underline}
+svg.i{width:16px;height:16px;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+h1,h2,h3,h4{margin:0}
+
+/* ---------- landing ---------- */
+.land{min-height:100vh;background:radial-gradient(1200px 600px at 50% -10%,#1d6a40 0%,var(--brand-900) 45%,var(--brand-950) 100%);color:#fff;display:flex;flex-direction:column;align-items:center;padding:64px 16px 40px}
+.badge{width:84px;height:84px;border-radius:50%;background:var(--brand-700);display:grid;place-items:center;box-shadow:inset 0 0 0 5px var(--amber),0 10px 30px rgba(0,0,0,.25)}
+.badge svg{width:44px;height:44px;color:#fff}
+.land h1{font-size:30px;margin-top:22px;text-align:center;letter-spacing:-.3px}
+.land .sub{color:#b9dcc5;margin-top:8px;text-align:center;max-width:620px}
+.land .lbl{margin:42px 0 16px;color:#8fc0a0;font-size:12px;letter-spacing:1.6px;text-transform:uppercase;font-weight:600}
+.pcards{display:grid;grid-template-columns:repeat(2,minmax(0,380px));gap:20px;width:100%;justify-content:center}
+.pcard{display:block;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:18px;padding:26px;color:#fff;position:relative;transition:.15s}
+.pcard:hover{background:rgba(255,255,255,.1);border-color:var(--amber);text-decoration:none;transform:translateY(-2px)}
+.pcard .pi{width:46px;height:46px;border-radius:12px;background:var(--amber);color:var(--brand-900);display:grid;place-items:center}
+.pcard .pi svg{width:24px;height:24px}
+.pcard h2{font-size:19px;margin:18px 0 8px}
+.pcard p{margin:0;color:#c3dccb;font-size:14px;line-height:1.55}
+.pcard .tag{display:inline-block;margin-top:18px;font-size:11.5px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--amber);border:1px solid rgba(240,180,41,.4);border-radius:20px;padding:5px 11px}
+.pcard .arr{position:absolute;right:22px;top:24px;color:#8fc0a0}
+.flow{margin-top:34px;max-width:780px;width:100%;background:rgba(0,0,0,.18);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:16px 20px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;color:#cfe6d7;font-size:13px}
+.flow b{color:#fff;font-weight:600}
+.flow .ar{color:var(--amber)}
+.land .foot{margin-top:auto;padding-top:40px;color:#7fae90;font-size:12px;text-align:center}
+@media (max-width:760px){.pcards{grid-template-columns:minmax(0,1fr)}.land h1{font-size:24px}}
+
+/* ---------- portal switcher ---------- */
+.switch{height:44px;background:var(--brand-950);display:flex;align-items:center;gap:6px;padding:0 16px;position:sticky;top:0;z-index:40;font-size:13px}
+.switch a.back{color:#9cc9ab;display:flex;align-items:center;gap:6px;margin-right:10px}
+.switch .tab{color:#cfe6d7;padding:6px 12px;border-radius:8px;display:flex;align-items:center;gap:7px;font-weight:500}
+.switch .tab:hover{background:rgba(255,255,255,.07);text-decoration:none}
+.switch .tab.on{background:var(--amber);color:var(--brand-950);font-weight:600}
+.switch .sp{flex:1}
+.switch .as{color:#9cc9ab;display:flex;align-items:center;gap:8px}
+.switch select{background:#123a23;border:1px solid #2a6a43;color:#fff;border-radius:7px;padding:4px 8px;font-size:13px}
+.switch .reset{background:none;border:1px solid #2a6a43;color:#9cc9ab;border-radius:7px;padding:4px 10px;cursor:pointer;font-size:12.5px}
+.switch .reset:hover{color:#fff}
+
+/* ---------- portal chrome ---------- */
+.top{height:60px;display:flex;align-items:center;padding:0 22px;gap:14px;position:sticky;top:44px;z-index:30}
+.top.npa{background:var(--brand-900);color:#fff}
+.top.con{background:#fff;border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:11px;font-weight:600;font-size:16px}
+.brand .mark{width:34px;height:34px;border-radius:50%;background:var(--brand-700);color:#fff;display:grid;place-items:center;box-shadow:inset 0 0 0 3px var(--amber)}
+.brand .mark svg{width:19px;height:19px}
+.brand small{display:block;font-weight:500;font-size:11.5px;opacity:.75}
+.top.npa .pill{font-weight:500;color:#a9d4b6;font-size:12px;padding:2px 9px;border:1px solid #2a6a43;border-radius:20px}
+.top.con .pill{font-weight:600;color:var(--brand-700);font-size:12px;padding:3px 10px;background:var(--brand-50);border:1px solid var(--brand-100);border-radius:20px}
+.top .sp{flex:1}
+.who{display:flex;align-items:center;gap:10px;font-size:13px}
+.top.npa .who{color:#cfe6d7}
+.top.con .who{color:var(--muted)}
+.who b{font-weight:600}
+.top.npa .who b{color:#fff}
+.top.con .who b{color:var(--text)}
+.av{width:32px;height:32px;border-radius:50%;background:var(--brand-600);display:grid;place-items:center;font-weight:600;font-size:12px;color:#fff;flex:none}
+.top.con .av{background:var(--amber);color:var(--brand-900)}
+
+.shell{display:flex;align-items:flex-start}
+.side{width:244px;flex:none;position:sticky;top:104px;height:calc(100vh - 104px);overflow-y:auto;padding:14px 12px 30px}
+.side.npa{background:#fff;border-right:1px solid var(--line)}
+.side.con{background:var(--brand-900);color:#cfe6d7}
+.side h6{margin:16px 0 6px;padding:0 10px;font-size:10.5px;letter-spacing:.8px;text-transform:uppercase;font-weight:700}
+.side.npa h6{color:var(--brand-700)}
+.side.con h6{color:#7fb592}
+.side h6:first-child{margin-top:4px}
+.nav{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;font-weight:500;font-size:13.5px;position:relative;margin-bottom:1px}
+.side.npa .nav{color:#2b3c31}
+.side.con .nav{color:#d6ecdd}
+.nav:hover{text-decoration:none}
+.side.npa .nav:hover{background:#f3f6f3}
+.side.con .nav:hover{background:rgba(255,255,255,.06)}
+.side.npa .nav .i{color:var(--dim)}
+.side.con .nav .i{color:#86b998}
+.side.npa .nav.on{background:var(--amber-50);color:var(--brand-900)}
+.side.npa .nav.on::before{content:"";position:absolute;left:-12px;top:6px;bottom:6px;width:3px;border-radius:3px;background:var(--amber)}
+.side.npa .nav.on .i{color:var(--brand-700)}
+.side.con .nav.on{background:rgba(240,180,41,.14);color:#fff}
+.side.con .nav.on .i{color:var(--amber)}
+.nav .l{flex:1}
+.cnt{font-size:11px;font-weight:700;border-radius:20px;padding:1px 7px;background:var(--amber);color:var(--brand-900)}
+.cnt.r{background:var(--red);color:#fff}
+.side .card-mini{margin:18px 4px 0;padding:12px;border-radius:10px;font-size:12.5px}
+.side.con .card-mini{background:rgba(255,255,255,.06);color:#b9dcc5}
+.side.con .card-mini b{color:#fff;display:block;font-size:15px;margin-top:2px}
+.side.npa .card-mini{background:var(--brand-50);color:var(--muted)}
+.side.npa .card-mini b{color:var(--brand-900);display:block;font-size:15px;margin-top:2px}
+
+.main{flex:1;min-width:0;padding:24px 28px 60px}
+.ph{display:flex;align-items:flex-end;gap:16px;margin-bottom:18px}
+.ph .t{flex:1;min-width:0}
+.ph .eyebrow{font-size:11.5px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--brand-600);margin-bottom:4px}
+.ph h1{font-size:23px;letter-spacing:-.3px}
+.ph p{margin:4px 0 0;color:var(--muted)}
+.crumb{font-size:12.5px;color:var(--muted);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+
+/* ---------- building blocks ---------- */
+.btn{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:#fff;border-radius:9px;padding:8px 14px;font-weight:600;font-size:13.5px;cursor:pointer;white-space:nowrap;color:var(--text)}
+.btn:hover{background:#f6f8f6;text-decoration:none}
+.btn.pri{background:var(--brand-700);border-color:var(--brand-700);color:#fff}
+.btn.pri:hover{background:var(--brand-800)}
+.btn.gold{background:var(--amber);border-color:var(--amber);color:var(--brand-950)}
+.btn.gold:hover{background:#e3a71d}
+.btn.red{color:var(--red);border-color:#f0c9c6}
+.btn.red:hover{background:var(--red-50)}
+.btn.orange{color:var(--orange);border-color:#f3d4ac}
+.btn.orange:hover{background:var(--orange-50)}
+.btn.sm{padding:5px 10px;font-size:12.5px;border-radius:8px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
+.card>.hd{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--line-2)}
+.card>.hd h3{font-size:15px;flex:1}
+.card>.hd .ico{width:30px;height:30px;border-radius:8px;background:var(--brand-50);color:var(--brand-700);display:grid;place-items:center}
+.card>.hd small{color:var(--muted);font-size:12.5px}
+.card>.bd{padding:16px 18px}
+.grid{display:grid;gap:16px}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.g-main{grid-template-columns:minmax(0,1.6fr) minmax(0,1fr)}
+.kpi{padding:16px 18px;border-left:4px solid var(--brand-600)}
+.kpi.a{border-left-color:var(--amber)}.kpi.o{border-left-color:var(--orange)}.kpi.r{border-left-color:var(--red)}.kpi.b{border-left-color:var(--blue)}
+.kpi .n{font-size:24px;font-weight:700;letter-spacing:-.4px}
+.kpi .l{color:var(--muted);font-size:12.5px;margin-top:2px}
+.kpi .s{font-size:12px;margin-top:8px;color:var(--brand-600);font-weight:600}
+.banner{display:flex;gap:12px;align-items:flex-start;padding:13px 16px;border-radius:10px;font-size:13.5px;margin-bottom:16px;border:1px solid}
+.banner.warn{background:var(--orange-50);border-color:#f3d4ac;color:#7a440a}
+.banner.ok{background:var(--green-50);border-color:#bfe5cf;color:#0e5c37}
+.banner.info{background:var(--blue-50);border-color:#c5dce8;color:#1d5470}
+.banner.err{background:var(--red-50);border-color:#f0c9c6;color:#8b2620}
+.banner .grow{flex:1}
+.banner .i{margin-top:2px}
+
+table.t{width:100%;border-collapse:collapse;font-size:13.5px}
+.t th{text-align:left;font-size:11.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);font-weight:600;padding:10px 14px;border-bottom:1px solid var(--line);background:#fafbfa;white-space:nowrap}
+.t td{padding:11px 14px;border-bottom:1px solid var(--line-2);vertical-align:middle}
+.t tr:last-child td{border-bottom:0}
+.t tr.click{cursor:pointer}
+.t tr.click:hover td{background:#f7faf7}
+.t .num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.t .sm{display:block;color:var(--muted);font-size:12px}
+.t .chk{width:36px}
+.st{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:3px 9px;border-radius:20px;white-space:nowrap}
+.st::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.st.submitted{background:var(--blue-50);color:var(--blue)}
+.st.review{background:var(--amber-50);color:#9a6a00}
+.st.approved{background:var(--brand-100);color:var(--brand-700)}
+.st.scheduled{background:#e8eefc;color:#3b5bb5}
+.st.paid{background:var(--green-50);color:var(--green)}
+.st.queried{background:var(--orange-50);color:var(--orange)}
+.st.rejected{background:var(--red-50);color:var(--red)}
+.flag{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;font-weight:600;color:var(--red);background:var(--red-50);border-radius:6px;padding:2px 7px;margin-left:6px}
+.flag.o{color:var(--orange);background:var(--orange-50)}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.tabs button{border:1px solid var(--line);background:#fff;border-radius:20px;padding:6px 13px;font-size:13px;font-weight:500;cursor:pointer;display:flex;gap:7px;align-items:center}
+.tabs button.on{background:var(--brand-900);border-color:var(--brand-900);color:#fff}
+.tabs button span{font-size:11.5px;font-weight:700;opacity:.7}
+.toolbar{display:flex;gap:10px;align-items:center;padding:12px 14px;border-bottom:1px solid var(--line-2)}
+.search{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:9px;padding:7px 11px;background:#fff;width:280px;color:var(--dim)}
+.search input{border:0;outline:0;flex:1;color:var(--text);background:none}
+.bar{height:8px;border-radius:8px;background:var(--line-2);overflow:hidden;display:flex}
+.bar i{display:block;height:100%;background:var(--brand-600)}
+.bar i.p{background:var(--amber)}
+.bar i.over{background:var(--red)}
+.row{display:flex;align-items:center;gap:10px}
+.muted{color:var(--muted)}
+.small{font-size:12.5px}
+.list .it{display:flex;align-items:center;gap:12px;padding:12px 18px;border-bottom:1px solid var(--line-2)}
+.list .it:last-child{border-bottom:0}
+.list .it .grow{flex:1;min-width:0}
+.list .it b{font-weight:600}
+.list .it .sm{display:block;color:var(--muted);font-size:12px}
+.list a.it{color:inherit}
+.list a.it:hover{background:#f7faf7;text-decoration:none}
+.dot{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;flex:none}
+.dot.r{background:var(--red-50);color:var(--red)}.dot.o{background:var(--orange-50);color:var(--orange)}.dot.b{background:var(--blue-50);color:var(--blue)}.dot.g{background:var(--brand-50);color:var(--brand-700)}.dot.a{background:var(--amber-50);color:#9a6a00}
+
+/* forms */
+.f{display:flex;flex-direction:column;gap:5px}
+.f label{font-size:12.5px;font-weight:600;color:#33433a}
+.f input,.f select,.f textarea{border:1px solid #d3dbd4;border-radius:9px;padding:9px 11px;background:#fff;outline:0;width:100%}
+.f input:focus,.f select:focus,.f textarea:focus{border-color:var(--brand-600);box-shadow:0 0 0 3px rgba(37,133,79,.14)}
+.f .help{font-size:12px;color:var(--muted)}
+.f input.ai{background:#fbfdf9;border-color:#bfe0cb}
+.f .aitag{font-size:10.5px;font-weight:700;color:var(--brand-600);text-transform:uppercase;letter-spacing:.5px;margin-left:6px}
+.c2{grid-column:span 2}.c3{grid-column:span 3}.c4{grid-column:1/-1}
+
+.drop{border:2px dashed #bfd7c7;border-radius:14px;background:var(--brand-50);padding:34px;text-align:center;cursor:pointer;transition:.15s}
+.drop:hover{border-color:var(--brand-600);background:#e9f5ed}
+.drop .big{width:54px;height:54px;border-radius:14px;background:#fff;color:var(--brand-700);display:grid;place-items:center;margin:0 auto 12px;box-shadow:var(--shadow)}
+.drop .big svg{width:26px;height:26px}
+.drop h3{font-size:16px}
+.drop p{margin:6px 0 14px;color:var(--muted);font-size:13px}
+.filecard{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:11px;padding:12px 14px;background:#fff}
+.filecard .fi{width:38px;height:44px;border-radius:7px;background:var(--red-50);color:var(--red);display:grid;place-items:center;font-size:10.5px;font-weight:800}
+.reading{display:flex;align-items:center;gap:10px;color:var(--brand-700);font-weight:600;font-size:13px;padding:10px 0}
+.spin{width:16px;height:16px;border-radius:50%;border:2px solid var(--brand-100);border-top-color:var(--brand-600);animation:sp .8s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+/* invoice tracker (contractor) */
+.track{display:flex;padding:20px 18px 18px}
+.track .s{flex:1;text-align:center;position:relative;font-size:12.5px;color:var(--dim);font-weight:500}
+.track .s::before{content:"";position:absolute;top:13px;left:-50%;right:50%;height:3px;background:var(--line)}
+.track .s:first-child::before{display:none}
+.track .s .c{width:28px;height:28px;border-radius:50%;background:#fff;border:2px solid var(--line);display:grid;place-items:center;margin:0 auto 7px;position:relative;z-index:1}
+.track .s.done{color:var(--text)}
+.track .s.done .c{background:var(--brand-600);border-color:var(--brand-600);color:#fff}
+.track .s.done::before,.track .s.cur::before{background:var(--brand-600)}
+.track .s.cur{color:var(--brand-900);font-weight:700}
+.track .s.cur .c{border-color:var(--amber);background:var(--amber-50);color:#9a6a00;box-shadow:0 0 0 4px rgba(240,180,41,.2)}
+.track .s.bad .c{border-color:var(--orange);background:var(--orange-50);color:var(--orange)}
+.track .s .c svg{width:14px;height:14px}
+
+/* invoice document mock */
+.doc{background:#5a625c;border-radius:10px;padding:22px;display:flex;justify-content:center}
+.paper{background:#fff;width:100%;max-width:520px;border-radius:3px;padding:30px 32px;font-size:12px;color:#222;box-shadow:0 6px 20px rgba(0,0,0,.25)}
+.paper .ph1{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:22px}
+.paper .co{font-weight:800;font-size:15px;color:#1b2a33}
+.paper .inv{font-size:20px;font-weight:300;letter-spacing:2px;color:#777}
+.paper table{width:100%;border-collapse:collapse;margin:16px 0}
+.paper th{text-align:left;font-size:10.5px;text-transform:uppercase;color:#888;border-bottom:1px solid #ddd;padding:5px 0}
+.paper td{padding:7px 0;border-bottom:1px solid #f0f0f0}
+.paper .r{text-align:right}
+.paper .tot{display:flex;justify-content:flex-end}
+.paper .tot div{width:220px}
+.paper .tot p{display:flex;justify-content:space-between;margin:4px 0}
+.paper .tot p.g{font-weight:800;font-size:14px;border-top:2px solid #222;padding-top:6px}
+.paper .meta{display:grid;grid-template-columns:1fr 1fr;gap:4px 18px;color:#555}
+.paper .meta b{color:#222}
+
+/* checks + timeline + thread */
+.checks .ck{display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--line-2);font-size:13.5px}
+.checks .ck:last-child{border-bottom:0}
+.checks .ck .m{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;flex:none}
+.checks .ck.ok .m{background:var(--green-50);color:var(--green)}
+.checks .ck.bad .m{background:var(--red-50);color:var(--red)}
+.checks .ck.warn .m{background:var(--orange-50);color:var(--orange)}
+.checks .ck .m svg{width:13px;height:13px;stroke-width:3}
+.checks .ck small{display:block;color:var(--muted);font-size:12px}
+.tl{position:relative;padding-left:20px}
+.tl::before{content:"";position:absolute;left:5px;top:6px;bottom:6px;width:2px;background:var(--line)}
+.tl .e{position:relative;padding:0 0 14px;font-size:13px}
+.tl .e::before{content:"";position:absolute;left:-19px;top:5px;width:10px;height:10px;border-radius:50%;background:#fff;border:2px solid var(--brand-600)}
+.tl .e small{display:block;color:var(--muted);font-size:12px}
+.thread .msg{max-width:88%;padding:10px 13px;border-radius:12px;margin-bottom:10px;font-size:13.5px}
+.thread .msg small{display:block;font-size:11.5px;opacity:.7;margin-bottom:3px;font-weight:600}
+.thread .msg.them{background:var(--grey-50)}
+.thread .msg.me{background:var(--brand-50);margin-left:auto;border:1px solid var(--brand-100)}
+.thread .empty{color:var(--muted);font-size:13px;padding:6px 0 12px}
+.reply{display:flex;gap:8px;align-items:flex-end}
+.reply textarea{flex:1;border:1px solid #d3dbd4;border-radius:9px;padding:9px 11px;min-height:42px;resize:vertical;outline:0}
+.chain{display:flex;flex-direction:column;gap:8px}
+.chain .ap{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;border:1px solid var(--line);font-size:13px}
+.chain .ap.done{background:var(--green-50);border-color:#bfe5cf}
+.chain .ap.next{border-color:var(--amber);background:var(--amber-50)}
+.chain .ap .grow{flex:1}
+.chain .ap small{display:block;color:var(--muted);font-size:12px}
+.kv{display:grid;grid-template-columns:130px 1fr;gap:8px 12px;font-size:13.5px}
+.kv dt{color:var(--muted)}
+.kv dd{margin:0;font-weight:500}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+
+/* modal + toast */
+.scrim{position:fixed;inset:0;background:rgba(10,30,18,.45);display:grid;place-items:center;z-index:100;padding:20px}
+.modal{background:#fff;border-radius:16px;width:100%;max-width:560px;box-shadow:0 20px 60px rgba(0,0,0,.3);max-height:90vh;display:flex;flex-direction:column}
+.modal .hd{padding:18px 22px;border-bottom:1px solid var(--line-2);display:flex;align-items:center;gap:10px}
+.modal .hd h3{flex:1;font-size:17px}
+.modal .bd{padding:18px 22px;overflow:auto}
+.modal .ft{padding:14px 22px;border-top:1px solid var(--line-2);display:flex;justify-content:flex-end;gap:8px}
+.x{background:none;border:0;cursor:pointer;color:var(--muted);padding:4px}
+#toast{position:fixed;bottom:24px;left:50%;transform:translate(-50%,20px);background:var(--brand-950);color:#fff;padding:11px 18px;border-radius:10px;font-weight:500;font-size:13.5px;opacity:0;transition:.2s;pointer-events:none;z-index:200;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+.wf{font-size:11.5px;color:var(--dim);margin-top:18px;text-align:center}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="modal"></div>
+<div id="toast"></div>
+<script>
+// ---------------------------------------------------------------------------
+// Data. Everything is invented. It lives in localStorage so an invoice a
+// contractor uploads shows up in NPA Finance, and NPA's replies show up back
+// in the contractor portal. "Reset demo" puts the seed data back.
+// Payments aren't made here: approved invoices go to NPA's accounts package
+// (Big Red Cloud) as now, and NPA records them as paid for the costs tracker.
+// ---------------------------------------------------------------------------
+const TODAY = '2026-11-11';
+const NPA_USER = { name: 'Anna Byrne', role: 'Finance manager', ini: 'AB' };
+
+const CATS = {
+  'Site & trackway': { code: '5010', holder: 'John Daly · Site manager', b2026: 420000, b2027: 440000, pre2026: 186000 },
+  'Marquees & structures': { code: '5020', holder: 'Mary Keane · Operations', b2026: 380000, b2027: 395000, pre2026: 128000 },
+  'Security & stewarding': { code: '5030', holder: 'Mary Keane · Operations', b2026: 260000, b2027: 270000, pre2026: 104000 },
+  'Waste & sanitation': { code: '5040', holder: 'John Daly · Site manager', b2026: 150000, b2027: 155000, pre2026: 61000 },
+  'Traffic management': { code: '5050', holder: 'Declan Ryan · Traffic & parking', b2026: 190000, b2027: 195000, pre2026: 82000 },
+  'Electrical & power': { code: '5060', holder: 'John Daly · Site manager', b2026: 210000, b2027: 220000, pre2026: 79000 },
+  'Print & signage': { code: '5070', holder: 'Gráinne Moore · Marketing', b2026: 65000, b2027: 68000, pre2026: 31000 },
+  'Communications': { code: '5080', holder: 'Mary Keane · Operations', b2026: 40000, b2027: 42000, pre2026: 22000 },
+  'Catering & hospitality': { code: '5090', holder: 'Gráinne Moore · Marketing', b2026: 90000, b2027: 92000, pre2026: 58000 },
+};
+const SECOND_APPROVAL = 25000; // invoices over this also need the finance manager
+
+function seed() {
+  const C = (id, name, type, cat, contact, email, phone, bk, portal = 'active') => ({ id, name, type, cat, contact, email, phone, bk, portal });
+  const contractors = [
+    C('kmh', 'Kilkenny Marquee Hire Ltd', 'Contractor', 'Marquees & structures', 'Tom Walsh', 'accounts@kilkennymarqueehire.ie', '056 772 1840', 'KIL014'),
+    C('mes', 'Midland Event Security', 'Contractor', 'Security & stewarding', 'Ciara Doyle', 'finance@midlandeventsecurity.ie', '057 935 2210', 'MID031'),
+    C('bws', 'Barrow Waste Services', 'Contractor', 'Waste & sanitation', 'Pat Nolan', 'invoices@barrowwaste.ie', '059 913 4402', 'BAR022'),
+    C('stm', 'Slaney Traffic Management', 'Contractor', 'Traffic management', 'Eoin Kavanagh', 'accounts@slaneytm.ie', '053 924 7712', 'SLA008'),
+    C('svt', 'Suir Valley Portable Toilets', 'Contractor', 'Waste & sanitation', 'Niamh Power', 'office@suirvalleypt.ie', '051 640 2281', 'SUI005'),
+    C('lpt', 'Laois Plant & Trackway Hire', 'Contractor', 'Site & trackway', 'Brian Delaney', 'accounts@laoisplant.ie', '057 862 3390', 'LAO017'),
+    C('nec', 'Nore Electrical Contractors', 'Contractor', 'Electrical & power', 'Fiona Brennan', 'fiona@noreelectrical.ie', '056 776 5521', 'NOR011'),
+    C('lsp', 'Leinster Signage & Print', 'Creditor', 'Print & signage', 'Shane Byrne', 'accounts@leinstersignage.ie', '01 456 2290', 'LEI040'),
+    C('ocs', 'Ossory Catering Supplies', 'Creditor', 'Catering & hospitality', 'Maeve Fitzpatrick', 'orders@ossorycatering.ie', '056 770 3318', 'OSS003'),
+    C('crh', 'Carlow Radio Hire', 'Creditor', 'Communications', 'Liam Murphy', 'liam@carlowradiohire.ie', '059 914 2207', 'CAR019', 'invited'),
+  ];
+  const P = (id, c, cat, event, desc, value, prior, raised) => ({ id, c, cat, event, desc, value, prior, raised });
+  const pos = [
+    P('PO26-0141', 'kmh', 'Marquees & structures', 2026, 'Exhibition marquees, flooring and lighting – Ploughing 2026', 186000, 0, '2026-04-14'),
+    P('PO27-0012', 'kmh', 'Marquees & structures', 2027, 'Marquee booking deposit – Ploughing 2027', 40000, 0, '2026-10-20'),
+    P('PO26-0152', 'mes', 'Security & stewarding', 2026, 'Event security, stewarding and overnight patrols', 142000, 0, '2026-05-02'),
+    P('PO26-0160', 'bws', 'Waste & sanitation', 2026, 'Waste collection, skips and site clean-up', 64000, 0, '2026-05-09'),
+    P('PO26-0163', 'stm', 'Traffic management', 2026, 'Traffic management plan, signage and marshals', 98000, 0, '2026-05-12'),
+    P('PO26-0170', 'svt', 'Waste & sanitation', 2026, 'Portable toilet units and servicing', 52000, 0, '2026-05-20'),
+    P('PO26-0118', 'lpt', 'Site & trackway', 2026, 'Trackway, ground matting and plant hire', 210000, 0, '2026-03-30'),
+    P('PO27-0004', 'lpt', 'Site & trackway', 2027, 'Ground preparation and drainage survey – 2027 site', 85000, 0, '2026-10-06'),
+    P('PO26-0175', 'nec', 'Electrical & power', 2026, 'Temporary power, generators and electrical inspection', 120000, 0, '2026-05-26'),
+    P('PO26-0181', 'lsp', 'Print & signage', 2026, 'Site signage, maps and printed programmes', 24000, 0, '2026-06-03'),
+    P('PO26-0190', 'crh', 'Communications', 2026, 'Two-way radio hire for stewards', 9500, 0, '2026-06-18'),
+    P('PO26-0193', 'ocs', 'Catering & hospitality', 2026, 'Hospitality tent supplies', 18000, 0, '2026-06-22'),
+  ];
+  let id = 100;
+  const H = (at, who, text) => ({ at, who, text });
+  const I = (c, no, date, po, net, vat, desc, status, extra = {}) => {
+    const i = { id: ++id, c, no, date, po, net, vat, desc, status, file: `${no}.pdf`, hist: [H(date, 'contractor', 'Invoice uploaded through the portal')], msgs: [], approvals: [], ...extra };
+    const p = pos.find(x => x.id === po); i.cat = p.cat; i.event = p.event;
+    return i;
+  };
+  const ok = (holder, at, paidAt) => ({ approvals: [{ who: holder, at }], paidAt });
+  const invoices = [
+    I('kmh', 'INV-2201', '2026-08-29', 'PO26-0141', 93000, 23, 'Marquee erection and hire – first stage payment', 'paid', ok('Mary Keane · Operations', '2026-09-08', '2026-09-24')),
+    I('lsp', 'LSP-2208', '2026-09-18', 'PO26-0181', 14800, 23, 'Site maps, directional signage and programmes', 'paid', ok('Gráinne Moore · Marketing', '2026-09-29', '2026-10-14')),
+    I('kmh', 'INV-2219', '2026-09-26', 'PO26-0141', 62000, 23, 'Marquee hire – main exhibition halls (balance)', 'paid', ok('Mary Keane · Operations', '2026-10-09', '2026-10-28')),
+    I('lpt', 'LPT-1180', '2026-09-27', 'PO26-0118', 118000, 23, 'Trackway and ground matting hire – event week', 'paid', ok('John Daly · Site manager', '2026-10-08', '2026-10-28')),
+    I('stm', 'STM-778', '2026-09-29', 'PO26-0163', 54000, 23, 'Traffic management – event days 1–3', 'paid', ok('Declan Ryan · Traffic & parking', '2026-10-06', '2026-10-14')),
+    I('mes', 'SEC-0912', '2026-09-30', 'PO26-0152', 71200, 23, 'Security and stewarding – event days 1–3', 'paid', ok('Mary Keane · Operations', '2026-10-06', '2026-10-14')),
+    I('bws', 'BWS-5521', '2026-10-02', 'PO26-0160', 31850, 23, 'Waste collection and skips – event week', 'paid', ok('John Daly · Site manager', '2026-10-12', '2026-10-28')),
+    I('svt', 'SVT-3301', '2026-10-04', 'PO26-0170', 26400, 13.5, 'Portable toilet units and servicing – event week', 'paid', ok('John Daly · Site manager', '2026-10-12', '2026-10-28')),
+    I('nec', 'NEC-4402', '2026-10-06', 'PO26-0175', 66300, 23, 'Temporary power and generator hire', 'paid', ok('John Daly · Site manager', '2026-10-15', '2026-10-28')),
+    I('kmh', 'INV-2231', '2026-10-08', 'PO26-0141', 8450, 23, 'Additional flooring – Agri Pavilion', 'queried', {
+      msgs: [{ from: 'npa', who: 'Anna Byrne', at: '2026-10-15', text: 'The Agri Pavilion flooring was in your original quote. Can you confirm why it is charged separately, or send a credit note?' }] }),
+    I('ocs', 'OCS-889', '2026-10-12', 'PO26-0193', 9400, 13.5, 'Hospitality tent catering supplies', 'approved', { approvals: [{ who: 'Gráinne Moore · Marketing', at: '2026-10-20' }] }),
+    I('mes', 'SEC-0931', '2026-10-21', 'PO26-0152', 38400, 23, 'Overnight patrols and takedown stewarding', 'approved', { approvals: [{ who: 'Mary Keane · Operations', at: '2026-10-29' }, { who: 'Anna Byrne · Finance manager', at: '2026-10-30' }] }),
+    I('stm', 'STM-790', '2026-10-25', 'PO26-0163', 39600, 23, 'Traffic management – build and takedown', 'approved', { approvals: [{ who: 'Declan Ryan · Traffic & parking', at: '2026-11-02' }, { who: 'Anna Byrne · Finance manager', at: '2026-11-03' }] }),
+    I('nec', 'NEC-4419', '2026-10-27', 'PO26-0175', 41250, 23, 'Electrical inspection, cabling and takedown', 'approved', { approvals: [{ who: 'John Daly · Site manager', at: '2026-11-04' }, { who: 'Anna Byrne · Finance manager', at: '2026-11-05' }] }),
+    I('lpt', 'LPT-1203', '2026-10-29', 'PO26-0118', 74500, 23, 'Plant hire and trackway removal', 'review', { approvals: [{ who: 'John Daly · Site manager', at: '2026-11-06' }] }),
+    I('bws', 'BWS-5560', '2026-10-30', 'PO26-0160', 18920, 23, 'Site clean-up and final waste removal', 'approved', { approvals: [{ who: 'John Daly · Site manager', at: '2026-11-07' }] }),
+    I('lsp', 'LSP-2230', '2026-10-31', 'PO26-0181', 6920, 23, '2027 early-bird banners', 'rejected', {
+      reason: 'Wrong purchase order. 2027 signage has not been ordered yet.',
+      msgs: [{ from: 'npa', who: 'Anna Byrne', at: '2026-11-04', text: 'Rejected: this is for 2027 signage, which hasn\'t been ordered yet. Please hold it until we send a 2027 PO.' }] }),
+    I('kmh', 'INV-2240', '2026-11-03', 'PO27-0012', 20000, 23, 'Deposit (50%) – Ploughing 2027 marquee booking', 'review'),
+    I('svt', 'SVT-3301', '2026-11-05', 'PO26-0170', 26400, 13.5, 'Portable toilet units and servicing – event week', 'submitted'),
+    I('mes', 'SEC-0944', '2026-11-06', 'PO26-0152', 4820, 23, 'Extra overnight patrol – 26 September', 'submitted'),
+    I('stm', 'STM-801', '2026-11-07', 'PO26-0163', 6200, 23, 'Additional marshals – Saturday car parks', 'submitted'),
+    I('lpt', 'LPT-1215', '2026-11-09', 'PO27-0004', 28000, 23, 'Ground preparation and drainage survey – 2027 site', 'submitted'),
+  ];
+  // History for the seeded invoices, following their status.
+  for (const i of invoices) {
+    if (i.status !== 'submitted') i.hist.push(H(i.date, 'npa', 'Checked by NPA Finance and coded to ' + CATS[i.cat].code));
+    for (const a of i.approvals) i.hist.push(H(a.at, 'npa', 'Approved by ' + a.who.split(' · ')[0]));
+    if (['approved', 'paid'].includes(i.status)) i.hist.push(H(i.approvals.slice(-1)[0].at, 'npa', 'Sent to Big Red Cloud for payment'));
+    if (i.status === 'queried') i.hist.push(H(i.msgs[0].at, 'npa', 'Query sent to the contractor'));
+    if (i.status === 'rejected') i.hist.push(H(i.msgs[0].at, 'npa', 'Rejected: ' + i.reason));
+    if (i.paidAt) i.hist.push(H(i.paidAt, 'npa', 'Marked as paid (paid through Big Red Cloud)'));
+  }
+  return { v: 2, contractors, pos, invoices, nextId: id + 1, as: 'kmh' };
+}
+
+const KEY = 'npa-invoice-portal-v2';
+let D;
+try { D = JSON.parse(localStorage.getItem(KEY)); } catch { D = null; }
+if (!D || D.v !== 2) D = seed();
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(D)); } catch {} };
+
+// ---------- helpers ----------
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const money = n => '€' + (Math.round(n * 100) / 100).toLocaleString('en-IE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const money0 = n => '€' + Math.round(n).toLocaleString('en-IE');
+const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const fd = d => { if (!d) return '–'; const [y, m, dd] = d.split('-'); return `${+dd} ${MON[m - 1]} ${y}`; };
+const vatOf = i => Math.round(i.net * i.vat) / 100;
+const total = i => i.net + vatOf(i);
+const con = id => D.contractors.find(c => c.id === id);
+const po = id => D.pos.find(p => p.id === id);
+const inv = id => D.invoices.find(i => i.id === +id);
+const sum = (a, f) => a.reduce((s, x) => s + f(x), 0);
+const live = i => i.status !== 'rejected';
+const done = i => ['approved', 'paid'].includes(i.status);
+const pending = i => ['submitted', 'review', 'queried'].includes(i.status);
+const poBilled = p => p.prior + sum(D.invoices.filter(i => i.po === p.id && live(i)), i => i.net);
+const chain = i => [CATS[i.cat].holder, ...(total(i) > SECOND_APPROVAL ? [NPA_USER.name + ' · ' + NPA_USER.role] : [])];
+const isDup = i => D.invoices.some(o => o.id !== i.id && o.c === i.c && o.no.toLowerCase() === i.no.toLowerCase() && live(o) && o.id < i.id);
+// Billed on the PO up to and including this invoice, so only the invoice that tips it over is flagged.
+const billedTo = i => { const p = po(i.po); return p.prior + sum(D.invoices.filter(o => o.po === p.id && live(o) && o.id <= i.id), o => o.net); };
+const overPo = i => { const p = po(i.po); return p && live(i) && billedTo(i) > p.value + 0.001; };
+const ST = { submitted: 'New', review: 'Awaiting approval', approved: 'Approved', paid: 'Paid', queried: 'Queried', rejected: 'Rejected' };
+const STC = { submitted: 'Received', review: 'In review', approved: 'Approved', paid: 'Paid', queried: 'Query from NPA', rejected: 'Rejected' };
+const st = (s, side) => `<span class="st ${s}">${(side === 'c' ? STC : ST)[s]}</span>`;
+const initials = n => n.split(/\s+/).filter(w => /^[A-Z]/.test(w)).slice(0, 2).map(w => w[0]).join('');
+
+const IC = {
+  sprig: 'M12 22V8M12 8c0-3 2-5 4-6 0 3-1.5 5-4 6zM12 8c0-3-2-5-4-6 0 3 1.5 5 4 6zM12 13c1-2.5 3.5-4 6-4-1 2.5-3 4-6 4zM12 13c-1-2.5-3.5-4-6-4 1 2.5 3 4 6 4zM12 18c1-2.5 3.5-4 6-4-1 2.5-3 4-6 4zM12 18c-1-2.5-3.5-4-6-4 1 2.5 3 4 6 4z',
+  home: 'M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z',
+  inbox: 'M22 12h-6l-2 3h-4l-2-3H2M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z',
+  check: 'M20 6 9 17l-5-5',
+  checkc: 'M22 11.08V12a10 10 0 1 1-5.93-9.14M22 4 12 14.01l-3-3',
+  euro: 'M18 7a7 7 0 1 0 0 10M4 10h10M4 14h10',
+  users: 'M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75',
+  file: 'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M16 13H8M16 17H8M10 9H8',
+  chart: 'M18 20V10M12 20V4M6 20v-6',
+  cog: 'M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1.08-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z',
+  upload: 'M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12',
+  list: 'M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01',
+  card: 'M21 4H3a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h18a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zM1 10h22',
+  building: 'M3 21h18M5 21V7l7-4 7 4v14M9 9h1M9 13h1M9 17h1M14 9h1M14 13h1M14 17h1',
+  alert: 'M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0zM12 9v4M12 17h.01',
+  clock: 'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM12 6v6l4 2',
+  x: 'M18 6 6 18M6 6l12 12',
+  send: 'M22 2 11 13M22 2l-7 20-4-9-9-4z',
+  download: 'M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3',
+  msg: 'M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z',
+  back: 'M19 12H5M12 19l-7-7 7-7',
+  arrow: 'M7 17 17 7M7 7h10v10',
+  plus: 'M12 5v14M5 12h14',
+  search: 'M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16zM21 21l-4.35-4.35',
+  copy: 'M20 9h-9a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-9a2 2 0 0 0-2-2zM5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1',
+  shield: 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z',
+  bank: 'M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 14v3M12 14v3M16 14v3',
+  mail: 'M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zM22 6l-10 7L2 6',
+  pen: 'M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z',
+  undo: 'M3 7v6h6M21 17a9 9 0 0 0-15-6.7L3 13',
+  out: 'M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9',
+  receipt: 'M4 2v20l3-2 3 2 3-2 3 2 3-2 1 .67V2l-3 2-3-2-3 2-3-2-3 2zM8 8h8M8 12h8M8 16h5',
+};
+const ic = (n, cls = 'i') => `<svg class="${cls}" viewBox="0 0 24 24"><path d="${IC[n]}"/></svg>`;
+
+const toast = m => { const t = $('#toast'); t.textContent = m; t.classList.add('on'); clearTimeout(toast.h); toast.h = setTimeout(() => t.classList.remove('on'), 2800); };
+
+function modal(title, body, foot) {
+  $('#modal').innerHTML = `<div class="scrim" onclick="if(event.target===this)A.close()"><div class="modal"><div class="hd"><h3>${title}</h3><button class="x" onclick="A.close()">${ic('x')}</button></div><div class="bd">${body}</div><div class="ft">${foot}</div></div></div>`;
+}
+const go = h => { location.hash = '#/' + h; };
+
+// ---------- landing ----------
+function vLanding() {
+  return `<div class="land">
+    <div class="badge">${ic('sprig')}</div>
+    <h1>Contractor &amp; Creditor Invoice Portal</h1>
+    <div class="sub">National Ploughing Association · contractors and creditors upload their invoices in one place, and NPA tracks every invoice and cost against its purchase orders and budgets.</div>
+    <div class="lbl">Select a portal to preview</div>
+    <div class="pcards">
+      <a class="pcard" href="#/npa/overview"><span class="arr">${ic('arrow')}</span><span class="pi">${ic('chart')}</span>
+        <h2>NPA Finance</h2><p>What NPA's finance team sees. An inbox of uploaded invoices with PO and duplicate checks, approval by the budget holder, and a costs tracker against the budget for each event.</p>
+        <span class="tag">Admin portal · 7 sections</span></a>
+      <a class="pcard" href="#/c/home"><span class="arr">${ic('arrow')}</span><span class="pi">${ic('upload')}</span>
+        <h2>Contractor &amp; creditor portal</h2><p>What a contractor sees. Upload an invoice against an NPA purchase order, follow it through to approval, and answer any queries from NPA.</p>
+        <span class="tag">Supplier portal · 4 sections</span></a>
+    </div>
+    <div class="flow"><b>Contractor uploads invoice</b><span class="ar">→</span>NPA checks PO &amp; duplicates<span class="ar">→</span>Budget holder approves<span class="ar">→</span><b>Cost tracked against budget</b></div>
+    <div class="foot">Prepared by DMC Consultancy Ltd · National Ploughing Association · November 2026<br>No payments are made here. Approved invoices are paid through NPA's accounts package as now.<br>Wireframe: all companies, people and figures are invented. Both portals share the same demo data.</div>
+  </div>`;
+}
+
+// ---------- shared chrome ----------
+function chrome(side, page, body) {
+  const c = con(D.as);
+  const active = D.contractors.filter(x => x.portal === 'active');
+  const sw = `<div class="switch"><a class="back" href="#/">${ic('back')} All portals</a>
+    <a class="tab ${side === 'npa' ? 'on' : ''}" href="#/npa/overview">${ic('chart')} NPA Finance</a>
+    <a class="tab ${side === 'c' ? 'on' : ''}" href="#/c/home">${ic('upload')} Contractor portal</a>
+    <span class="sp"></span>
+    ${side === 'c' ? `<span class="as">Viewing as <select onchange="A.as(this.value)">${active.map(x => `<option value="${x.id}" ${x.id === D.as ? 'selected' : ''}>${esc(x.name)}</option>`).join('')}</select></span>` : ''}
+    <button class="reset" onclick="A.reset()">Reset demo data</button></div>`;
+  if (side === 'npa') {
+    const n = s => D.invoices.filter(i => i.status === s).length;
+    const N = (r, icon, label, cnt) => `<a class="nav ${page === r ? 'on' : ''}" href="#/npa/${r}">${ic(icon)}<span class="l">${label}</span>${cnt ? `<span class="cnt">${cnt}</span>` : ''}</a>`;
+    const month = D.invoices.filter(i => live(i) && i.hist[0].at >= TODAY.slice(0, 8) + '01');
+    return sw + `<div class="top npa"><a class="brand" href="#/npa/overview" style="color:#fff"><span class="mark">${ic('sprig')}</span><span>NPA Finance<small>National Ploughing Association</small></span></a><span class="pill">Invoices &amp; costs</span>
+      <span class="sp"></span><div class="who"><span>Signed in as <b>${NPA_USER.name}</b> · ${NPA_USER.role}</span><span class="av">${NPA_USER.ini}</span></div></div>
+      <div class="shell"><nav class="side npa">
+        <h6>Overview</h6>${N('overview', 'home', 'Overview')}
+        <h6>Invoices</h6>${N('inbox', 'inbox', 'Invoice inbox', n('submitted'))}${N('approvals', 'checkc', 'Approvals', n('review'))}
+        <h6>Costs</h6>${N('costs', 'chart', 'Costs tracker')}${N('pos', 'file', 'Purchase orders')}
+        <h6>People</h6>${N('creditors', 'users', 'Contractors &amp; creditors')}
+        <h6>Setup</h6>${N('settings', 'cog', 'Settings')}
+        <div class="card-mini">Uploaded this month<b>${money(sum(month, total))}</b>${month.length} invoices</div>
+      </nav><main class="main">${body}</main></div>`;
+  }
+  const mine = D.invoices.filter(i => i.c === c.id);
+  const q = mine.filter(i => i.status === 'queried').length;
+  const N = (r, icon, label, cnt, cls = '') => `<a class="nav ${page === r ? 'on' : ''}" href="#/c/${r}">${ic(icon)}<span class="l">${label}</span>${cnt ? `<span class="cnt ${cls}">${cnt}</span>` : ''}</a>`;
+  return sw + `<div class="top con"><a class="brand" href="#/c/home" style="color:var(--text)"><span class="mark">${ic('sprig')}</span><span>NPA Supplier Portal<small style="color:var(--muted)">National Ploughing Association</small></span></a><span class="pill">Contractors &amp; creditors</span>
+      <span class="sp"></span><div class="who"><span><b>${esc(c.contact)}</b> · ${esc(c.name)}</span><span class="av">${initials(c.contact)}</span></div></div>
+      <div class="shell"><nav class="side con">
+        <h6>${esc(c.name)}</h6>${N('home', 'home', 'Dashboard')}${N('upload', 'upload', 'Upload invoice')}${N('invoices', 'list', 'My invoices', q, 'r')}${N('pos', 'file', 'Purchase orders')}
+        <div class="card-mini">Waiting on NPA approval<b>${money(sum(mine.filter(pending), total))}</b></div>
+      </nav><main class="main">${body}</main></div>`;
+}
+
+// ---------------------------------------------------------------------------
+// NPA Finance
+// ---------------------------------------------------------------------------
+function issuesOf(i) {
+  const out = [];
+  if (isDup(i)) out.push('Possible duplicate');
+  if (overPo(i)) out.push('Over PO');
+  return out;
+}
+const flags = i => issuesOf(i).map(f => `<span class="flag">${ic('alert')}${f}</span>`).join('');
+
+function invRows(list) {
+  if (!list.length) return `<tr><td colspan="9" class="muted" style="text-align:center;padding:30px">Nothing here.</td></tr>`;
+  return list.map(i => `<tr class="click" onclick="go('npa/inv/${i.id}')">
+    <td><b>${esc(i.no)}</b>${flags(i)}<span class="sm">${esc(i.desc)}</span></td>
+    <td>${esc(con(i.c).name)}<span class="sm">${con(i.c).type}</span></td>
+    <td>${i.po}<span class="sm">${i.cat}</span></td>
+    <td>${fd(i.date)}<span class="sm">Uploaded ${fd(i.hist[0].at)}</span></td>
+    <td class="num"><b>${money(total(i))}</b><span class="sm">${money(i.net)} + VAT</span></td>
+    <td>${st(i.status)}</td></tr>`).join('');
+}
+const invHead = () => `<thead><tr><th>Invoice</th><th>Contractor</th><th>PO / category</th><th>Dated</th><th class="num">Amount</th><th>Status</th></tr></thead>`;
+
+function costBars(ev) {
+  const cats = Object.keys(CATS).map(k => ({ k, ...spend(k, ev) })).sort((a, b) => b.spent / b.budget - a.spent / a.budget);
+  return cats.map(x => `<div style="margin-bottom:13px"><div class="row small" style="margin-bottom:5px"><b style="flex:1;font-weight:600">${x.k}</b><span class="muted">${money0(x.spent)} / ${money0(x.budget)}</span></div>
+    <div class="bar"><i class="${x.spent > x.budget ? 'over' : ''}" style="width:${Math.min(100, x.spent / x.budget * 100)}%"></i><i class="p" style="width:${Math.max(0, Math.min(100 - x.spent / x.budget * 100, x.pending / x.budget * 100))}%"></i></div></div>`).join('')
+    + `<div class="row small muted" style="gap:14px;margin-top:4px"><span class="row" style="gap:5px"><i style="width:10px;height:10px;border-radius:3px;background:var(--brand-600);display:inline-block"></i>Approved</span><span class="row" style="gap:5px"><i style="width:10px;height:10px;border-radius:3px;background:var(--amber);display:inline-block"></i>Waiting for approval</span></div>`;
+}
+
+function vOverview() {
+  const by = s => D.invoices.filter(i => i.status === s);
+  const ev26 = D.invoices.filter(i => i.event === 2026 && live(i));
+  const alerts = [];
+  for (const i of D.invoices.filter(x => ['submitted', 'review'].includes(x.status))) {
+    if (isDup(i)) alerts.push(['r', 'copy', `Possible duplicate: ${i.no} from ${con(i.c).name}`, `Same invoice number as one uploaded on ${fd(D.invoices.find(o => o.c === i.c && o.no === i.no && o.id !== i.id).hist[0].at)}`, i.id]);
+    if (overPo(i)) { const p = po(i.po); alerts.push(['r', 'alert', `${i.no} takes ${i.po} over its value`, `${money0(billedTo(i))} invoiced against a ${money0(p.value)} PO`, i.id]); }
+  }
+  for (const i of by('queried')) alerts.push(['o', 'msg', `Waiting on ${con(i.c).name} to answer a query`, `${i.no} · asked ${fd(i.msgs.filter(m => m.from === 'npa').slice(-1)[0]?.at)}`, i.id]);
+  const old = by('review').filter(i => i.hist.slice(-1)[0].at <= '2026-11-04');
+  for (const i of old) alerts.push(['a', 'clock', `${i.no} has waited a week for approval`, `With ${chain(i)[i.approvals.length].split(' · ')[0]} since ${fd(i.hist.slice(-1)[0].at)}`, i.id]);
+  const top = D.contractors.map(c => ({ c, t: sum(ev26.filter(i => i.c === c.id), i => i.net) })).filter(x => x.t).sort((a, b) => b.t - a.t).slice(0, 5);
+  return chrome('npa', 'overview', `
+    <div class="ph"><div class="t"><div class="eyebrow">Overview</div><h1>Good morning, ${NPA_USER.name.split(' ')[0]}</h1><p>${fd(TODAY)} · Ploughing 2026 close-out and 2027 deposits</p></div>
+      <a class="btn" href="#/npa/costs">${ic('chart')}Costs tracker</a><a class="btn pri" href="#/npa/inbox">${ic('inbox')}Open inbox</a></div>
+    <div class="grid g4" style="margin-bottom:16px">
+      <a class="card kpi b" href="#/npa/inbox" style="color:inherit;text-decoration:none"><div class="n">${by('submitted').length}</div><div class="l">New invoices to check</div><div class="s">${money0(sum(by('submitted'), total))} in total →</div></a>
+      <a class="card kpi a" href="#/npa/approvals" style="color:inherit;text-decoration:none"><div class="n">${by('review').length}</div><div class="l">Awaiting approval</div><div class="s">${money0(sum(by('review'), total))} with budget holders →</div></a>
+      <div class="card kpi o"><div class="n">${by('queried').length}</div><div class="l">Queried with contractors</div><div class="s" style="color:var(--muted)">${money0(sum(by('queried'), total))} on hold</div></div>
+      <a class="card kpi" href="#/npa/costs" style="color:inherit;text-decoration:none"><div class="n">${money0(sum(Object.keys(CATS), k => spend(k, 2026).spent))}</div><div class="l">Ploughing 2026 costs approved</div><div class="s">of ${money0(sum(Object.keys(CATS), k => CATS[k].b2026))} budget →</div></a>
+    </div>
+    <div class="grid g-main">
+      <div class="grid" style="align-content:start">
+        <div class="card"><div class="hd"><span class="ico">${ic('alert')}</span><h3>Needs attention</h3><small>${alerts.length} items</small></div>
+          <div class="list">${alerts.map(([c, icon, t, s, id]) => `<a class="it" href="#/npa/inv/${id}"><span class="dot ${c}">${ic(icon)}</span><span class="grow"><b>${esc(t)}</b><span class="sm">${esc(s)}</span></span>${ic('arrow')}</a>`).join('') || '<div class="it muted">All clear.</div>'}</div></div>
+        <div class="card"><div class="hd"><span class="ico">${ic('inbox')}</span><h3>Latest invoices</h3><a class="small" href="#/npa/inbox">View all →</a></div>
+          <table class="t">${invHead()}<tbody>${invRows([...D.invoices].sort((a, b) => b.id - a.id).slice(0, 6))}</tbody></table></div>
+      </div>
+      <div class="grid" style="align-content:start">
+        <div class="card"><div class="hd"><span class="ico">${ic('chart')}</span><h3>Ploughing 2026 costs vs budget</h3></div><div class="bd">${costBars(2026)}</div></div>
+        <div class="card"><div class="hd"><span class="ico">${ic('users')}</span><h3>Biggest costs · Ploughing 2026</h3><small>Invoiced, ex VAT</small></div>
+          <div class="list">${top.map(x => `<div class="it"><span class="av" style="width:30px;height:30px;font-size:11px">${initials(x.c.name)}</span><span class="grow"><b>${esc(x.c.name)}</b><span class="sm">${x.c.cat}</span></span><b>${money0(x.t)}</b></div>`).join('')}</div></div>
+      </div>
+    </div>`);
+}
+
+// Approved covers approved and paid; waiting covers anything not yet approved.
+function spend(cat, ev) {
+  const l = D.invoices.filter(i => i.cat === cat && i.event === ev);
+  const spent = (ev === 2026 ? CATS[cat].pre2026 : 0) + sum(l.filter(done), i => i.net);
+  return { spent, pending: sum(l.filter(pending), i => i.net), paid: sum(l.filter(i => i.status === 'paid'), i => i.net), budget: CATS[cat]['b' + ev] };
+}
+
+let inboxTab = 'submitted', inboxQ = '';
+function vInbox() {
+  const tabs = [['submitted', 'New'], ['queried', 'Queried'], ['review', 'Awaiting approval'], ['approved', 'Approved'], ['paid', 'Paid'], ['rejected', 'Rejected'], ['all', 'All']];
+  const q = inboxQ.toLowerCase();
+  const list = D.invoices.filter(i => (inboxTab === 'all' || i.status === inboxTab) && (!q || [i.no, i.desc, con(i.c).name, i.po].join(' ').toLowerCase().includes(q))).sort((a, b) => b.id - a.id);
+  return chrome('npa', 'inbox', `
+    <div class="ph"><div class="t"><div class="eyebrow">Invoices</div><h1>Invoice inbox</h1><p>Everything contractors and creditors have uploaded. Check each one, code it, and send it to the budget holder.</p></div>
+      <button class="btn" onclick="A.emailIn()">${ic('mail')}Invoices by email</button><button class="btn" onclick="A.csv()">${ic('download')}Export CSV</button></div>
+    <div class="tabs">${tabs.map(([k, l]) => `<button class="${inboxTab === k ? 'on' : ''}" onclick="A.tab('${k}')">${l}<span>${k === 'all' ? D.invoices.length : D.invoices.filter(i => i.status === k).length}</span></button>`).join('')}</div>
+    <div class="card"><div class="toolbar"><label class="search">${ic('search')}<input id="q" placeholder="Search invoice, contractor or PO" value="${esc(inboxQ)}" oninput="A.q(this.value)"></label><span class="sp" style="flex:1"></span><span class="small muted">${list.length} invoice${list.length === 1 ? '' : 's'} · ${money(sum(list, total))}</span></div>
+      <table class="t">${invHead()}<tbody>${invRows(list)}</tbody></table></div>`);
+}
+
+function vApprovals() {
+  const list = D.invoices.filter(i => i.status === 'review').sort((a, b) => a.id - b.id);
+  const holders = [...new Set(list.map(i => chain(i)[i.approvals.length]))];
+  return chrome('npa', 'approvals', `
+    <div class="ph"><div class="t"><div class="eyebrow">Invoices</div><h1>Approvals</h1><p>Each invoice goes to the budget holder for its category. Anything over ${money0(SECOND_APPROVAL)} also needs the finance manager.</p></div>
+      <button class="btn" onclick="A.toast('Reminder emailed to ${holders.length} budget holder${holders.length === 1 ? '' : 's'}')">${ic('mail')}Remind approvers</button></div>
+    ${holders.map(h => { const l = list.filter(i => chain(i)[i.approvals.length] === h); return `<div class="card" style="margin-bottom:16px"><div class="hd"><span class="av" style="width:30px;height:30px;font-size:11px">${initials(h.split(' · ')[0])}</span><h3>${esc(h)}<small style="display:block;font-weight:400">${l.length} waiting · ${money(sum(l, total))}</small></h3></div>
+      <table class="t">${invHead()}<tbody>${invRows(l)}</tbody></table></div>`; }).join('') || `<div class="card"><div class="bd muted" style="text-align:center;padding:40px">Nothing waiting for approval.</div></div>`}`);
+}
+
+function paper(i) {
+  const c = con(i.c), lines = i.net > 30000 ? [[i.desc, 1, i.net * .82], ['Delivery, labour and takedown', 1, i.net * .18]] : [[i.desc, 1, i.net]];
+  return `<div class="doc"><div class="paper">
+    <div class="ph1"><div><div class="co">${esc(c.name)}</div><div style="color:#777;margin-top:3px">${esc(c.email)} · ${esc(c.phone)}</div></div><div class="inv">INVOICE</div></div>
+    <div class="meta"><span>Invoice no. <b>${esc(i.no)}</b></span><span>Date <b>${fd(i.date)}</b></span><span>To <b>National Ploughing Association</b></span><span>Your PO <b>${i.po}</b></span></div>
+    <table><thead><tr><th>Description</th><th class="r">Qty</th><th class="r">Amount</th></tr></thead><tbody>
+      ${lines.map(([d, q, a]) => `<tr><td>${esc(d)}</td><td class="r">${q}</td><td class="r">${money(a)}</td></tr>`).join('')}</tbody></table>
+    <div class="tot"><div><p><span>Net</span><span>${money(i.net)}</span></p><p><span>VAT @ ${i.vat}%</span><span>${money(vatOf(i))}</span></p><p class="g"><span>Total</span><span>${money(total(i))}</span></p></div></div>
+  </div></div>`;
+}
+
+function checksOf(i) {
+  const p = po(i.po), billed = live(i) ? billedTo(i) : poBilled(p);
+  const dupOf = D.invoices.find(o => o.id !== i.id && o.c === i.c && o.no.toLowerCase() === i.no.toLowerCase() && live(o) && o.id < i.id);
+  const ck = (cls, t, s) => `<div class="ck ${cls}"><span class="m">${ic(cls === 'ok' ? 'check' : 'x')}</span><span>${t}<small>${s}</small></span></div>`;
+  return `<div class="checks">
+    ${ck(p && p.c === i.c ? 'ok' : 'bad', 'Matches an open purchase order', p ? `${p.id} · ${esc(p.desc)}` : 'No PO found')}
+    ${ck(billed <= p.value ? 'ok' : 'bad', billed <= p.value ? 'Within the PO value' : 'Takes the PO over its value', `${money0(billed)} invoiced of ${money0(p.value)} (${money0(p.value - billed)} left)`)}
+    ${ck(dupOf ? 'bad' : 'ok', dupOf ? 'Possible duplicate' : 'Not a duplicate', dupOf ? `Same invoice number as ${esc(dupOf.no)} uploaded ${fd(dupOf.hist[0].at)} (${ST[dupOf.status].toLowerCase()})` : 'No other invoice with this number from this contractor')}
+  </div>`;
+}
+
+function thread(i, me) {
+  const msgs = i.msgs.length ? i.msgs.map(m => `<div class="msg ${m.from === me ? 'me' : 'them'}"><small>${esc(m.who)} · ${fd(m.at)}</small>${esc(m.text)}${m.file ? `<div class="small" style="margin-top:5px">${ic('file')} ${esc(m.file)}</div>` : ''}</div>`).join('') : `<div class="empty">No messages yet.</div>`;
+  return `<div class="thread">${msgs}</div>`;
+}
+
+function vInvoiceNpa(id) {
+  const i = inv(id); if (!i) return chrome('npa', 'inbox', '<p>Invoice not found.</p>');
+  const c = con(i.c), ch = chain(i), s = i.status;
+  const nextApprover = ch[i.approvals.length];
+  let act = '';
+  if (s === 'submitted') act = `<button class="btn pri" onclick="A.sendApproval(${i.id})">${ic('send')}Send to ${esc(ch[0].split(' · ')[0])} for approval</button><button class="btn orange" onclick="A.queryModal(${i.id})">${ic('msg')}Query</button><button class="btn red" onclick="A.rejectModal(${i.id})">${ic('x')}Reject</button>`;
+  if (s === 'review') act = `<button class="btn pri" onclick="A.approve(${i.id})">${ic('check')}Approve as ${esc(nextApprover.split(' · ')[0])}</button><button class="btn orange" onclick="A.queryModal(${i.id})">${ic('msg')}Query</button><button class="btn red" onclick="A.rejectModal(${i.id})">${ic('x')}Reject</button>`;
+  if (s === 'approved') act = `<span class="small muted">Approved and sent to Big Red Cloud for payment.</span><button class="btn" onclick="A.paidModal(${i.id})">${ic('check')}Mark as paid</button>`;
+  if (s === 'queried') act = `<span class="small muted">Waiting for ${esc(c.contact)} to reply. You can still</span><button class="btn red" onclick="A.rejectModal(${i.id})">${ic('x')}Reject</button>`;
+  if (s === 'paid') act = `<span class="small muted">Paid through Big Red Cloud on ${fd(i.paidAt)}.</span>`;
+  if (s === 'rejected') act = `<span class="small muted">Rejected: ${esc(i.reason || '')}</span>`;
+  return chrome('npa', s === 'review' ? 'approvals' : 'inbox', `
+    <div class="crumb"><a href="#/npa/inbox">Invoice inbox</a> › ${esc(i.no)}</div>
+    <div class="ph"><div class="t"><h1>${esc(i.no)} · ${esc(c.name)} ${st(s)}</h1><p>${esc(i.desc)} · uploaded ${fd(i.hist[0].at)}</p></div>
+      <div style="text-align:right"><div class="small muted">Total incl. VAT</div><div style="font-size:24px;font-weight:700">${money(total(i))}</div></div></div>
+    ${issuesOf(i).length && ['submitted', 'review'].includes(s) ? `<div class="banner err">${ic('alert')}<div class="grow"><b>${issuesOf(i).join(' · ')}.</b> Check the items marked below before this goes any further.</div></div>` : ''}
+    <div class="card" style="margin-bottom:16px"><div class="bd actions" style="align-items:center">${act}</div></div>
+    <div class="grid g2">
+      <div class="grid" style="align-content:start">
+        <div class="card"><div class="hd"><span class="ico">${ic('file')}</span><h3>${esc(i.file)}</h3><button class="btn sm" onclick="A.toast('Opens the original PDF')">${ic('download')}Original</button></div><div class="bd" style="padding:0">${paper(i)}</div></div>
+        <div class="card"><div class="hd"><span class="ico">${ic('clock')}</span><h3>History</h3></div><div class="bd"><div class="tl">${[...i.hist].reverse().map(h => `<div class="e">${esc(h.text)}<small>${fd(h.at)} · ${h.who === 'npa' ? 'NPA Finance' : esc(c.name)}</small></div>`).join('')}</div></div></div>
+      </div>
+      <div class="grid" style="align-content:start">
+        <div class="card"><div class="hd"><span class="ico">${ic('shield')}</span><h3>Automatic checks</h3></div><div class="bd">${checksOf(i)}</div></div>
+        <div class="card"><div class="hd"><span class="ico">${ic('pen')}</span><h3>Coding</h3><small>Goes to Big Red Cloud with the invoice</small></div><div class="bd"><div class="grid g2">
+          <div class="f"><label>Cost category</label><select ${['submitted', 'review'].includes(s) ? '' : 'disabled'} onchange="A.recode(${i.id},this.value)">${Object.keys(CATS).map(k => `<option ${k === i.cat ? 'selected' : ''}>${k}</option>`).join('')}</select></div>
+          <div class="f"><label>Nominal code</label><input value="${CATS[i.cat].code} – ${i.cat}" disabled></div>
+          <div class="f"><label>Event</label><input value="Ploughing ${i.event}" disabled></div>
+          <div class="f"><label>Creditor account</label><input value="${c.bk}" disabled></div>
+        </div></div></div>
+        <div class="card"><div class="hd"><span class="ico">${ic('users')}</span><h3>Approval</h3><small>${ch.length === 2 ? `Over ${money0(SECOND_APPROVAL)}: two approvals` : 'Budget holder'}</small></div><div class="bd"><div class="chain">
+          ${ch.map((h, k) => { const a = i.approvals[k], nx = !a && k === i.approvals.length && s === 'review'; return `<div class="ap ${a ? 'done' : nx ? 'next' : ''}"><span class="av" style="width:28px;height:28px;font-size:11px;${a ? '' : 'background:#c9d3cb'}">${initials(h.split(' · ')[0])}</span><span class="grow">${esc(h)}<small>${a ? 'Approved ' + fd(a.at) : nx ? 'Waiting on this approval' : s === 'submitted' ? 'Not sent yet' : '–'}</small></span>${a ? ic('check') : ''}</div>`; }).join('')}
+        </div></div></div>
+        <div class="card"><div class="hd"><span class="ico">${ic('msg')}</span><h3>Messages with ${esc(c.contact)}</h3></div><div class="bd">${thread(i, 'npa')}
+          <div class="reply"><textarea id="msg" placeholder="Write to ${esc(c.contact)}…"></textarea><button class="btn pri" onclick="A.msg(${i.id},'npa')">${ic('send')}Send</button></div></div></div>
+      </div>
+    </div>`);
+}
+
+function vPOs() {
+  return chrome('npa', 'pos', `
+    <div class="ph"><div class="t"><div class="eyebrow">Costs</div><h1>Purchase orders</h1><p>Contractors invoice against these, and can see what's left on each one.</p></div><button class="btn pri" onclick="A.poModal()">${ic('plus')}Add a PO</button></div>
+    <div class="card"><table class="t"><thead><tr><th>PO</th><th>Contractor</th><th>Category</th><th>Event</th><th class="num">Value</th><th class="num">Invoiced</th><th style="width:200px">Used</th></tr></thead><tbody>
+      ${[...D.pos].sort((a, b) => b.raised.localeCompare(a.raised)).map(p => { const b = poBilled(p), pc = b / p.value * 100; return `<tr><td><b>${p.id}</b><span class="sm">${esc(p.desc)}</span></td><td>${esc(con(p.c).name)}</td><td>${p.cat}</td><td>${p.event}</td><td class="num">${money0(p.value)}</td><td class="num">${money0(b)}<span class="sm">${money0(p.value - b)} left</span></td>
+        <td><div class="bar"><i class="${pc > 100 ? 'over' : ''}" style="width:${Math.min(100, pc)}%"></i></div><span class="small muted">${Math.round(pc)}%</span></td></tr>`; }).join('')}</tbody></table></div>`);
+}
+
+let costEv = 2026, costBy = 'cat';
+function vCosts() {
+  const rows = Object.keys(CATS).map(k => ({ k, ...spend(k, costEv) }));
+  const T = { budget: sum(rows, r => r.budget), spent: sum(rows, r => r.spent), pending: sum(rows, r => r.pending) };
+  const evInv = D.invoices.filter(i => i.event === costEv);
+  const byCon = D.contractors.map(c => {
+    const l = evInv.filter(i => i.c === c.id), ps = D.pos.filter(p => p.c === c.id && p.event === costEv);
+    return { c, n: l.filter(live).length, po: sum(ps, p => p.value), spent: sum(l.filter(done), i => i.net), pending: sum(l.filter(pending), i => i.net), paid: sum(l.filter(i => i.status === 'paid'), i => i.net) };
+  }).filter(x => x.n || x.po).sort((a, b) => (b.spent + b.pending) - (a.spent + a.pending));
+  const bar = (spent, pend, of) => `<div class="bar"><i class="${spent > of ? 'over' : ''}" style="width:${Math.min(100, spent / of * 100)}%"></i><i class="p" style="width:${Math.max(0, Math.min(100 - spent / of * 100, pend / of * 100))}%"></i></div>`;
+  return chrome('npa', 'costs', `
+    <div class="ph"><div class="t"><div class="eyebrow">Costs</div><h1>Costs tracker</h1><p>Every invoice uploaded, against the budget for each category and the PO for each contractor. Figures are ex VAT.</p></div>
+      <div class="tabs" style="margin:0">${[2026, 2027].map(e => `<button class="${costEv === e ? 'on' : ''}" onclick="A.ev(${e})">Ploughing ${e}</button>`).join('')}</div><button class="btn" onclick="A.costCsv()">${ic('download')}Export CSV</button></div>
+    <div class="grid g4" style="margin-bottom:16px">
+      <div class="card kpi"><div class="n">${money0(T.budget)}</div><div class="l">Budget</div></div>
+      <div class="card kpi"><div class="n">${money0(T.spent)}</div><div class="l">Approved (${Math.round(T.spent / T.budget * 100)}% of budget)</div></div>
+      <div class="card kpi a"><div class="n">${money0(T.pending)}</div><div class="l">Uploaded, waiting for approval</div></div>
+      <div class="card kpi b"><div class="n">${money0(T.budget - T.spent - T.pending)}</div><div class="l">Left in the budget</div></div></div>
+    <div class="tabs">${[['cat', 'By category'], ['con', 'By contractor']].map(([k, l]) => `<button class="${costBy === k ? 'on' : ''}" onclick="A.by('${k}')">${l}</button>`).join('')}</div>
+    ${costBy === 'cat' ? `<div class="card"><table class="t"><thead><tr><th>Category</th><th>Nominal</th><th>Budget holder</th><th class="num">Budget</th><th class="num">Approved</th><th class="num">Waiting</th><th class="num">Left</th><th style="width:200px"></th></tr></thead><tbody>
+      ${rows.map(r => `<tr><td><b>${r.k}</b></td><td>${CATS[r.k].code}</td><td class="muted">${CATS[r.k].holder}</td><td class="num">${money0(r.budget)}</td><td class="num">${money0(r.spent)}</td><td class="num">${money0(r.pending)}</td><td class="num"><b style="color:${r.budget - r.spent - r.pending < 0 ? 'var(--red)' : 'inherit'}">${money0(r.budget - r.spent - r.pending)}</b></td><td>${bar(r.spent, r.pending, r.budget)}</td></tr>`).join('')}
+    </tbody></table></div>
+    ${costEv === 2026 ? '<p class="small muted" style="margin-top:10px">Ploughing 2026 includes costs posted in Big Red Cloud before the portal went live.</p>' : ''}`
+    : `<div class="card"><table class="t"><thead><tr><th>Contractor</th><th class="num">Invoices</th><th class="num">PO value</th><th class="num">Approved</th><th class="num">Waiting</th><th class="num">Paid</th><th class="num">Left on POs</th><th style="width:200px"></th></tr></thead><tbody>
+      ${byCon.map(x => `<tr><td><b>${esc(x.c.name)}</b><span class="sm">${x.c.cat}</span></td><td class="num">${x.n}</td><td class="num">${money0(x.po)}</td><td class="num">${money0(x.spent)}</td><td class="num">${money0(x.pending)}</td><td class="num">${money0(x.paid)}</td><td class="num"><b style="color:${x.po - x.spent - x.pending < 0 ? 'var(--red)' : 'inherit'}">${money0(x.po - x.spent - x.pending)}</b></td><td>${x.po ? bar(x.spent, x.pending, x.po) : ''}</td></tr>`).join('') || '<tr><td colspan="8" class="muted" style="text-align:center;padding:26px">No invoices for this event yet.</td></tr>'}
+    </tbody></table></div>`}`);
+}
+
+function vCreditors() {
+  return chrome('npa', 'creditors', `
+    <div class="ph"><div class="t"><div class="eyebrow">People</div><h1>Contractors &amp; creditors</h1><p>Who can upload invoices to NPA, and what they've invoiced so far.</p></div><button class="btn pri" onclick="A.inviteModal()">${ic('plus')}Invite a contractor</button></div>
+    <div class="card"><table class="t"><thead><tr><th>Company</th><th>Category</th><th>Portal</th><th class="num">Invoices</th><th class="num">Waiting for approval</th><th class="num">Approved</th><th></th></tr></thead><tbody>
+      ${D.contractors.map(c => { const l = D.invoices.filter(i => i.c === c.id && live(i));
+        return `<tr><td><b>${esc(c.name)}</b><span class="sm">${c.type} · ${c.bk} · ${esc(c.contact)} · ${esc(c.email)}</span></td><td>${c.cat}</td>
+        <td>${c.portal === 'active' ? '<span class="st paid">Active</span>' : '<span class="st review">Invited</span>'}</td>
+        <td class="num">${l.length}</td><td class="num">${money(sum(l.filter(pending), total))}</td><td class="num">${money(sum(l.filter(done), total))}</td>
+        <td>${c.portal === 'active' ? `<button class="btn sm" onclick="A.as('${c.id}',true)">View their portal</button>` : `<button class="btn sm" onclick="A.toast('Invite re-sent to ${esc(c.email)}')">Resend invite</button>`}</td></tr>`; }).join('')}
+    </tbody></table></div>`);
+}
+
+function vSettings() {
+  return chrome('npa', 'settings', `
+    <div class="ph"><div class="t"><div class="eyebrow">Setup</div><h1>Settings</h1><p>Approval rules, how invoices come in, and the cost categories they're tracked against.</p></div><button class="btn pri" onclick="A.toast('Settings saved')">${ic('check')}Save</button></div>
+    <div class="grid g2">
+      <div class="card"><div class="hd"><span class="ico">${ic('users')}</span><h3>Approval rules</h3></div><div class="bd grid g2">
+        <div class="f"><label>Every invoice is approved by</label><select><option>The budget holder for its category</option></select></div>
+        <div class="f"><label>Second approval over</label><input value="${money0(SECOND_APPROVAL)}"><span class="help">Also approved by the finance manager</span></div>
+        <div class="f c4"><label>Stop approval when</label><div class="small" style="display:grid;gap:6px;margin-top:4px">
+          <label class="row"><input type="checkbox" checked> The invoice takes a PO over its value</label><label class="row"><input type="checkbox" checked> It may be a duplicate</label></div></div></div></div>
+      <div class="card"><div class="hd"><span class="ico">${ic('out')}</span><h3>Accounts package</h3></div><div class="bd small">
+        <p style="margin-top:0">Payments aren't made in the portal. Approved invoices are sent to <b>Big Red Cloud</b>, and NPA pays them there as now.</p>
+        <div class="grid g2"><div class="f"><label>Send approved invoices</label><select><option>Automatically, when approved</option><option>In a daily batch</option></select></div>
+        <div class="f"><label>Paid status</label><select><option>Mark as paid by hand</option><option>Read back from Big Red Cloud</option></select></div></div></div></div>
+      <div class="card"><div class="hd"><span class="ico">${ic('mail')}</span><h3>Invoices by email</h3></div><div class="bd small">
+        <p style="margin-top:0">Creditors who don't use the portal can email PDFs to <b>invoices@npa-portal.ie</b>. They land in the inbox the same way, matched by sender.</p>
+        <div class="f"><label>Unknown senders</label><select><option>Hold in the inbox for review</option></select></div></div></div>
+      <div class="card"><div class="hd"><span class="ico">${ic('msg')}</span><h3>Emails to contractors</h3></div><div class="bd small" style="display:grid;gap:8px">
+        <label class="row"><input type="checkbox" checked> Invoice received</label><label class="row"><input type="checkbox" checked> Query from NPA</label><label class="row"><input type="checkbox" checked> Invoice approved</label><label class="row"><input type="checkbox" checked> Invoice rejected</label><label class="row"><input type="checkbox"> Invoice paid</label></div></div>
+    </div>
+    <div class="card" style="margin-top:16px"><div class="hd"><span class="ico">${ic('chart')}</span><h3>Cost categories</h3></div><table class="t"><thead><tr><th>Category</th><th>Nominal code</th><th>Budget holder</th><th class="num">2026 budget</th><th class="num">2027 budget</th></tr></thead><tbody>
+      ${Object.entries(CATS).map(([k, v]) => `<tr><td><b>${k}</b></td><td>${v.code}</td><td>${v.holder}</td><td class="num">${money0(v.b2026)}</td><td class="num">${money0(v.b2027)}</td></tr>`).join('')}</tbody></table></div>`);
+}
+
+// ---------------------------------------------------------------------------
+// Contractor portal
+// ---------------------------------------------------------------------------
+function vCHome() {
+  const c = con(D.as), mine = D.invoices.filter(i => i.c === c.id).sort((a, b) => b.id - a.id);
+  const lv = mine.filter(live), wait = mine.filter(pending), ok = mine.filter(done);
+  const q = mine.filter(i => i.status === 'queried');
+  const pos = D.pos.filter(p => p.c === c.id);
+  return chrome('c', 'home', `
+    <div class="ph"><div class="t"><div class="eyebrow">Dashboard</div><h1>Good morning, ${esc(c.contact.split(' ')[0])}</h1><p>Your invoices to the National Ploughing Association</p></div><a class="btn gold" href="#/c/upload">${ic('upload')}Upload an invoice</a></div>
+    ${q.map(i => `<div class="banner warn">${ic('msg')}<div class="grow"><b>NPA has a question about ${esc(i.no)}.</b> ${esc(i.msgs.filter(m => m.from === 'npa').slice(-1)[0]?.text || '')}</div><a class="btn sm" href="#/c/inv/${i.id}">Reply</a></div>`).join('')}
+    <div class="grid g4" style="margin-bottom:16px">
+      <div class="card kpi"><div class="n">${money0(sum(lv, total))}</div><div class="l">Invoiced to NPA</div><div class="s" style="color:var(--muted)">${lv.length} invoice${lv.length === 1 ? '' : 's'}</div></div>
+      <div class="card kpi a"><div class="n">${money0(sum(wait, total))}</div><div class="l">Waiting for approval</div><div class="s" style="color:var(--muted)">${wait.length} invoice${wait.length === 1 ? '' : 's'}</div></div>
+      <div class="card kpi b"><div class="n">${money0(sum(ok, total))}</div><div class="l">Approved by NPA</div><div class="s" style="color:var(--muted)">${ok.length} invoice${ok.length === 1 ? '' : 's'}</div></div>
+      <div class="card kpi o"><div class="n">${q.length}</div><div class="l">Queries to answer</div><div class="s" style="color:var(--muted)">${q.length ? 'See the note above' : 'All clear'}</div></div>
+    </div>
+    <div class="grid g-main">
+      <div class="card"><div class="hd"><span class="ico">${ic('list')}</span><h3>Recent invoices</h3><a class="small" href="#/c/invoices">View all →</a></div>${cInvTable(mine.slice(0, 7))}</div>
+      <div class="card" style="align-self:start"><div class="hd"><span class="ico">${ic('file')}</span><h3>Your purchase orders</h3><a class="small" href="#/c/pos">View →</a></div><div class="bd">
+        ${pos.map(p => { const b = poBilled(p); return `<div style="margin-bottom:14px"><div class="row small" style="margin-bottom:5px"><b style="flex:1">${p.id}</b><span class="muted">${money0(p.value - b)} left of ${money0(p.value)}</span></div><div class="bar"><i class="${b > p.value ? 'over' : ''}" style="width:${Math.min(100, b / p.value * 100)}%"></i></div><div class="small muted" style="margin-top:4px">${esc(p.desc)}</div></div>`; }).join('') || '<span class="muted small">No purchase orders.</span>'}</div></div>
+    </div>`);
+}
+
+function cInvTable(list) {
+  if (!list.length) return '<div class="bd muted" style="text-align:center;padding:30px">No invoices yet.</div>';
+  return `<table class="t"><thead><tr><th>Invoice</th><th>PO</th><th>Dated</th><th class="num">Amount</th><th>Status</th></tr></thead><tbody>
+    ${list.map(i => `<tr class="click" onclick="go('c/inv/${i.id}')"><td><b>${esc(i.no)}</b><span class="sm">${esc(i.desc)}</span></td><td>${i.po}</td><td>${fd(i.date)}</td><td class="num"><b>${money(total(i))}</b></td><td>${st(i.status, 'c')}</td></tr>`).join('')}</tbody></table>`;
+}
+
+let cTab = 'all';
+const C_TABS = { all: () => true, open: pending, approved: done };
+function vCInvoices() {
+  const c = con(D.as), mine = D.invoices.filter(i => i.c === c.id).sort((a, b) => b.id - a.id);
+  const tabs = [['all', 'All'], ['open', 'Waiting for approval'], ['queried', 'Queries'], ['approved', 'Approved'], ['rejected', 'Rejected']];
+  const f = k => C_TABS[k] || (i => i.status === k);
+  return chrome('c', 'invoices', `
+    <div class="ph"><div class="t"><div class="eyebrow">Invoices</div><h1>My invoices</h1><p>Every invoice you've sent NPA and where it's got to.</p></div><a class="btn gold" href="#/c/upload">${ic('upload')}Upload an invoice</a></div>
+    <div class="tabs">${tabs.map(([k, l]) => `<button class="${cTab === k ? 'on' : ''}" onclick="A.ctab('${k}')">${l}<span>${mine.filter(f(k)).length}</span></button>`).join('')}</div>
+    <div class="card">${cInvTable(mine.filter(f(cTab)))}</div>`);
+}
+
+function vCInvoice(id) {
+  const i = inv(id), c = con(D.as);
+  if (!i || i.c !== c.id) return chrome('c', 'invoices', `<div class="banner info">${ic('alert')}<div class="grow">That invoice belongs to another company. <a href="#/c/invoices">Back to my invoices</a></div></div>`);
+  const steps = [['submitted', 'Received'], ['review', 'In review'], ['approved', 'Approved'], ['paid', 'Paid']];
+  const order = steps.map(s => s[0]);
+  const at = ['queried', 'rejected'].includes(i.status) ? 1 : order.indexOf(i.status);
+  const just = A.justSent === i.id; A.justSent = null;
+  const lastQ = i.msgs.filter(m => m.from === 'npa').slice(-1)[0];
+  const note = { submitted: 'NPA Finance has received this and will check it against your purchase order.', review: `With NPA for approval (${i.approvals.length} of ${chain(i).length} approvals).`, approved: 'Approved. It has gone to NPA\'s accounts team to be paid in line with your agreed terms.', paid: `NPA has recorded this as paid on ${fd(i.paidAt)}.`, queried: 'On hold until you reply.', rejected: 'Not going ahead.' }[i.status];
+  return chrome('c', 'invoices', `
+    <div class="crumb"><a href="#/c/invoices">My invoices</a> › ${esc(i.no)}</div>
+    ${just ? `<div class="banner ok">${ic('checkc')}<div class="grow"><b>Invoice ${esc(i.no)} sent to NPA.</b> We'll email you when it's approved, or if NPA has a question. You can follow it here.</div></div>` : ''}
+    <div class="ph"><div class="t"><h1>${esc(i.no)} ${st(i.status, 'c')}</h1><p>${esc(i.desc)} · ${i.po}</p></div><div style="text-align:right"><div class="small muted">Total incl. VAT</div><div style="font-size:24px;font-weight:700">${money(total(i))}</div></div></div>
+    ${i.status === 'queried' ? `<div class="banner warn">${ic('msg')}<div class="grow"><b>NPA asked:</b> ${esc(lastQ?.text || '')}<br><span class="small">Reply below. You can attach a corrected invoice or credit note.</span></div></div>` : ''}
+    ${i.status === 'rejected' ? `<div class="banner err">${ic('x')}<div class="grow"><b>NPA rejected this invoice.</b> ${esc(i.reason || '')}</div></div>` : ''}
+    <div class="card" style="margin-bottom:16px"><div class="track">${steps.map(([k, l], n) => {
+      const bad = n === 1 && ['queried', 'rejected'].includes(i.status);
+      const cls = bad ? 'cur bad' : n < at || i.status === 'paid' ? 'done' : n === at ? 'cur' : '';
+      return `<div class="s ${cls}"><div class="c">${n < at || i.status === 'paid' ? ic('check') : bad ? ic(i.status === 'queried' ? 'msg' : 'x') : n + 1}</div>${bad ? STC[i.status] : l}</div>`; }).join('')}</div>
+      <div class="bd" style="border-top:1px solid var(--line-2);font-size:13px">${note}</div></div>
+    <div class="grid g2">
+      <div class="card"><div class="hd"><span class="ico">${ic('file')}</span><h3>${esc(i.file)}</h3></div><div class="bd" style="padding:0">${paper(i)}</div></div>
+      <div class="grid" style="align-content:start">
+        <div class="card"><div class="hd"><span class="ico">${ic('msg')}</span><h3>Messages with NPA Finance</h3></div><div class="bd">${thread(i, 'c')}
+          ${['rejected', 'paid'].includes(i.status) ? '' : `<div class="reply"><textarea id="msg" placeholder="Write to NPA Finance…"></textarea><button class="btn pri" onclick="A.msg(${i.id},'c')">${ic('send')}Send</button></div>
+          ${i.status === 'queried' ? `<div class="row" style="margin-top:10px"><label class="row small" style="gap:6px"><input type="checkbox" id="attach"> Attach a corrected invoice or credit note</label></div>` : ''}`}</div></div>
+        <div class="card"><div class="hd"><span class="ico">${ic('clock')}</span><h3>History</h3></div><div class="bd"><div class="tl">${[...i.hist].reverse().map(h => `<div class="e">${esc(h.text.replace(/ and coded to \d+/, '').replace('Sent to Big Red Cloud for payment', 'Passed to NPA accounts for payment').replace(' (paid through Big Red Cloud)', ''))}<small>${fd(h.at)} · ${h.who === 'npa' ? 'NPA Finance' : 'You'}</small></div>`).join('')}</div></div></div>
+      </div>
+    </div>`);
+}
+
+// Upload flow: pick a file, the portal reads it, the contractor checks the fields and sends.
+let up = null;
+const SAMPLE = { kmh: ['INV-2252', 'PO27-0012', 4250, 'Site visit and marquee layout planning – 2027'], mes: ['SEC-0951', 'PO26-0152', 2960, 'Debrief and incident report preparation'], bws: ['BWS-5588', 'PO26-0160', 3480, 'Skip hire – November site tidy'], stm: ['STM-812', 'PO26-0163', 1850, 'Traffic management plan review'], svt: ['SVT-3340', 'PO26-0170', 2200, 'Unit cleaning and return'], lpt: ['LPT-1226', 'PO27-0004', 9600, 'Topographical survey – 2027 site'], nec: ['NEC-4431', 'PO26-0175', 3150, 'Generator return and testing'], lsp: ['LSP-2241', 'PO26-0181', 1290, 'Reprint of car park signs'], ocs: ['OCS-902', 'PO26-0193', 860, 'Hospitality tent consumables'] };
+function vCUpload() {
+  const c = con(D.as), pos = D.pos.filter(p => p.c === c.id);
+  const s = up;
+  let body;
+  if (!s) body = `<div class="drop" onclick="A.pick()"><div class="big">${ic('upload')}</div><h3>Drop your invoice here, or click to choose it</h3><p>PDF, JPG or PNG. One invoice per upload. We'll read the details for you to check.</p><span class="btn pri">${ic('file')}Choose file</span></div>`;
+  else if (s.reading) body = `<div class="filecard"><span class="fi">PDF</span><div style="flex:1"><b>${esc(s.file)}</b><div class="small muted">212 KB</div></div></div><div class="reading"><span class="spin"></span>Reading the invoice number, date, PO and amounts…</div>`;
+  else {
+    const p = po(s.po), left = p ? p.value - poBilled(p) : 0, tot = (+s.net || 0) * (1 + (+s.vat) / 100);
+    const dup = D.invoices.some(i => i.c === c.id && i.no.toLowerCase() === String(s.no).trim().toLowerCase() && live(i));
+    const tag = k => s.ai.includes(k) ? '<span class="aitag">Auto-filled</span>' : '';
+    const F = (l, k, extra = '') => `<div class="f"><label>${l}${tag(k)}</label><input class="${s.ai.includes(k) ? 'ai' : ''}" value="${esc(s[k])}" oninput="A.up('${k}',this.value)" ${extra}></div>`;
+    body = `<div class="filecard" style="margin-bottom:16px"><span class="fi">PDF</span><div style="flex:1"><b>${esc(s.file)}</b><div class="small muted">212 KB · details read from the file, please check them</div></div><button class="btn sm" onclick="A.unpick()">${ic('x')}Remove</button></div>
+      <div class="grid g3">
+        ${F('Your invoice number', 'no')}${F('Invoice date', 'date', 'type="date"')}
+        <div class="f"><label>NPA purchase order${tag('po')}</label><select onchange="A.up('po',this.value)">${pos.map(x => `<option value="${x.id}" ${x.id === s.po ? 'selected' : ''}>${x.id} · ${money0(x.value - poBilled(x))} left</option>`).join('')}</select></div>
+        <div class="f c2"><label>Description${tag('desc')}</label><input class="${s.ai.includes('desc') ? 'ai' : ''}" value="${esc(s.desc)}" oninput="A.up('desc',this.value)"></div>
+        <div class="f"><label>Net amount (€)${tag('net')}</label><input class="${s.ai.includes('net') ? 'ai' : ''}" type="number" step="0.01" value="${esc(s.net)}" oninput="A.up('net',this.value)"></div>
+        <div class="f"><label>VAT rate</label><select onchange="A.up('vat',this.value)">${[23, 13.5, 9, 0].map(v => `<option value="${v}" ${+s.vat === v ? 'selected' : ''}>${v}%</option>`).join('')}</select></div>
+        <div class="f"><label>Total incl. VAT</label><input id="uptot" value="${money(tot)}" disabled></div>
+        <div class="f"><label>Supporting documents</label><button class="btn" style="justify-content:center" onclick="A.support()">${ic('plus')}${s.support ? esc(s.support) : 'Add timesheet or docket'}</button></div>
+      </div>
+      <div id="upwarn">${upWarn(s, left, dup)}</div>
+      <div class="row" style="justify-content:flex-end;margin-top:18px;gap:8px"><button class="btn" onclick="A.unpick()">Cancel</button><button class="btn pri" onclick="A.submitInv()">${ic('send')}Send to NPA</button></div>`;
+  }
+  return chrome('c', 'upload', `
+    <div class="ph"><div class="t"><div class="eyebrow">Invoices</div><h1>Upload an invoice</h1><p>Send your invoice to NPA Finance against one of your purchase orders.</p></div></div>
+    <div class="grid g-main"><div class="card"><div class="bd" style="padding:22px">${body}</div></div>
+      <div class="grid" style="align-content:start">
+        <div class="card"><div class="hd"><span class="ico">${ic('checkc')}</span><h3>Before you send</h3></div><div class="bd small" style="display:grid;gap:10px">
+          <div class="row" style="align-items:flex-start">${ic('check')}<span>Quote your NPA purchase order number on the invoice.</span></div>
+          <div class="row" style="align-items:flex-start">${ic('check')}<span>Invoice to <b>National Ploughing Association</b>, Fallaghmore, Athy, Co. Kildare.</span></div>
+          <div class="row" style="align-items:flex-start">${ic('check')}<span>Upload each invoice once. Sending the same one twice can hold it up.</span></div></div></div>
+        <div class="card"><div class="hd"><span class="ico">${ic('clock')}</span><h3>What happens next</h3></div><div class="bd"><div class="tl">
+          <div class="e">NPA Finance checks it against your PO<small>Usually within 2 working days</small></div><div class="e">The budget holder approves it<small>We'll email you if there's a question</small></div><div class="e">It goes to NPA's accounts team to be paid<small>In line with your agreed payment terms</small></div></div></div></div>
+      </div></div>`);
+}
+function upWarn(s, left, dup) {
+  const out = [];
+  if (dup) out.push(`<div class="banner err" style="margin:16px 0 0">${ic('copy')}<div class="grow"><b>You've already sent an invoice numbered ${esc(s.no)}.</b> If this is a copy, there's no need to send it again.</div></div>`);
+  if (+s.net > left) out.push(`<div class="banner warn" style="margin:16px 0 0">${ic('alert')}<div class="grow"><b>This is more than what's left on ${s.po} (${money(left)}).</b> You can still send it, but NPA will need to approve the extra.</div></div>`);
+  return out.join('');
+}
+
+function vCPOs() {
+  const c = con(D.as), pos = D.pos.filter(p => p.c === c.id);
+  return chrome('c', 'pos', `
+    <div class="ph"><div class="t"><div class="eyebrow">Purchase orders</div><h1>Purchase orders from NPA</h1><p>Invoice against one of these. You can see how much is left on each.</p></div></div>
+    <div class="grid g2">${pos.map(p => { const b = poBilled(p), l = D.invoices.filter(i => i.po === p.id); return `<div class="card"><div class="hd"><span class="ico">${ic('file')}</span><h3>${p.id}<small style="display:block;font-weight:400">${esc(p.desc)}</small></h3><span class="st ${p.event === 2027 ? 'submitted' : 'approved'}">Ploughing ${p.event}</span></div><div class="bd">
+      <div class="grid g3" style="margin-bottom:14px"><div><div class="small muted">PO value</div><b style="font-size:17px">${money0(p.value)}</b></div><div><div class="small muted">Invoiced</div><b style="font-size:17px">${money0(b)}</b></div><div><div class="small muted">Left</div><b style="font-size:17px;color:${p.value - b < 0 ? 'var(--red)' : 'var(--brand-700)'}">${money0(p.value - b)}</b></div></div>
+      <div class="bar"><i class="${b > p.value ? 'over' : ''}" style="width:${Math.min(100, b / p.value * 100)}%"></i></div>
+      <div class="small muted" style="margin-top:12px">Issued ${fd(p.raised)} · ${l.length} invoice${l.length === 1 ? '' : 's'} · ${p.cat}</div>
+      <div class="row" style="margin-top:12px;gap:8px"><a class="btn sm" href="#/c/upload" onclick="A.prePO='${p.id}'">${ic('upload')}Invoice against this PO</a><button class="btn sm" onclick="A.toast('${p.id}.pdf downloaded (wireframe)')">${ic('download')}PO document</button></div></div></div>`; }).join('') || '<div class="card"><div class="bd muted">No purchase orders yet.</div></div>'}</div>`);
+}
+
+// ---------------------------------------------------------------------------
+// Actions
+// ---------------------------------------------------------------------------
+const A = {
+  justSent: null, prePO: null,
+  toast,
+  close() { $('#modal').innerHTML = ''; },
+  reset() { if (!confirm('Put all demo data back to how it started?')) return; D = seed(); save(); up = null; toast('Demo data reset'); render(); },
+  as(id, open) { D.as = id; save(); up = null; if (open) go('c/home'); else render(); },
+  tab(k) { inboxTab = k; render(); },
+  q(v) { inboxQ = v; render(); const el = $('#q'); el.focus(); el.setSelectionRange(v.length, v.length); },
+  ctab(k) { cTab = k; render(); },
+  ev(e) { costEv = e; render(); },
+  by(k) { costBy = k; render(); },
+  log(i, who, text) { i.hist.push({ at: TODAY, who, text }); },
+  sendApproval(id) { const i = inv(id); i.status = 'review'; A.log(i, 'npa', 'Checked by NPA Finance and coded to ' + CATS[i.cat].code); A.log(i, 'npa', 'Sent to ' + chain(i)[0].split(' · ')[0] + ' for approval'); save(); toast(`${i.no} sent to ${chain(i)[0].split(' · ')[0]} for approval`); render(); },
+  approve(id) {
+    const i = inv(id), ch = chain(i), who = ch[i.approvals.length];
+    i.approvals.push({ who, at: TODAY }); A.log(i, 'npa', 'Approved by ' + who.split(' · ')[0]);
+    if (i.approvals.length >= ch.length) { i.status = 'approved'; A.log(i, 'npa', 'Sent to Big Red Cloud for payment'); toast(`${i.no} approved and sent to Big Red Cloud for payment`); }
+    else toast(`Approved by ${who.split(' · ')[0]}. Now with ${ch[i.approvals.length].split(' · ')[0]}.`);
+    save(); render();
+  },
+  paidModal(id) {
+    const i = inv(id);
+    modal(`Mark ${esc(i.no)} as paid`, `<p class="small muted" style="margin-top:0">For the costs tracker only. The payment itself is made in Big Red Cloud.</p>
+      <div class="f"><label>Date paid</label><input type="date" id="pd" value="${TODAY}"></div>`,
+      `<button class="btn" onclick="A.close()">Cancel</button><button class="btn pri" onclick="A.paid(${id})">${ic('check')}Mark as paid</button>`);
+  },
+  paid(id) { const i = inv(id); i.status = 'paid'; i.paidAt = $('#pd').value || TODAY; A.log(i, 'npa', 'Marked as paid (paid through Big Red Cloud)'); save(); A.close(); toast(`${i.no} marked as paid`); render(); },
+  recode(id, cat) { const i = inv(id); i.cat = cat; A.log(i, 'npa', 'Recoded to ' + cat); save(); render(); },
+  queryModal(id) {
+    const i = inv(id);
+    modal(`Query ${esc(i.no)}`, `<p class="small muted" style="margin-top:0">${esc(con(i.c).contact)} gets an email and sees this on their dashboard. The invoice is on hold until they reply.</p>
+      <div class="f"><label>Reason</label><select id="qr"><option>Amount doesn't match the quote</option><option>Wrong or missing PO number</option><option>Need a timesheet or docket</option><option>VAT is wrong</option><option>Other</option></select></div>
+      <div class="f" style="margin-top:12px"><label>Message</label><textarea id="qm" rows="4" placeholder="What do you need from them?"></textarea></div>`,
+      `<button class="btn" onclick="A.close()">Cancel</button><button class="btn orange" onclick="A.query(${id})">${ic('send')}Send query</button>`);
+  },
+  query(id) {
+    const i = inv(id), r = $('#qr').value, m = $('#qm').value.trim();
+    i.status = 'queried'; i.msgs.push({ from: 'npa', who: NPA_USER.name, at: TODAY, text: r + (m ? ': ' + m : '.') });
+    A.log(i, 'npa', 'Query sent to the contractor'); save(); A.close(); toast(`Query sent to ${con(i.c).contact}`); render();
+  },
+  rejectModal(id) {
+    const i = inv(id);
+    modal(`Reject ${esc(i.no)}`, `<p class="small muted" style="margin-top:0">The contractor is told why. They'd need to send a new invoice.</p>
+      <div class="f"><label>Reason</label><select id="rr"><option>Duplicate of an invoice already received</option><option>Wrong purchase order</option><option>Work not carried out or not agreed</option><option>Not addressed to the National Ploughing Association</option></select></div>
+      <div class="f" style="margin-top:12px"><label>Note to the contractor (optional)</label><textarea id="rm" rows="3"></textarea></div>`,
+      `<button class="btn" onclick="A.close()">Cancel</button><button class="btn red" onclick="A.reject(${id})">${ic('x')}Reject invoice</button>`);
+  },
+  reject(id) {
+    const i = inv(id), r = $('#rr').value, m = $('#rm').value.trim();
+    i.status = 'rejected'; i.reason = r + '.'; i.msgs.push({ from: 'npa', who: NPA_USER.name, at: TODAY, text: 'Rejected: ' + r + (m ? '. ' + m : '.') });
+    A.log(i, 'npa', 'Rejected: ' + r); save(); A.close(); toast(`${i.no} rejected`); render();
+  },
+  msg(id, side) {
+    const i = inv(id), t = $('#msg').value.trim(), att = side === 'c' && $('#attach')?.checked;
+    if (!t && !att) return toast('Write a message first');
+    const c = con(i.c);
+    i.msgs.push({ from: side, who: side === 'npa' ? NPA_USER.name : c.contact, at: TODAY, text: t || 'Corrected invoice attached.', file: att ? i.no + '-corrected.pdf' : '' });
+    if (side === 'c' && i.status === 'queried') { i.status = i.approvals.length ? 'review' : 'submitted'; A.log(i, 'contractor', 'Replied to the query' + (att ? ' with a corrected invoice' : '')); toast('Reply sent. NPA Finance will pick it up again.'); }
+    else toast(side === 'npa' ? `Message sent to ${c.contact}` : 'Message sent to NPA Finance');
+    save(); render();
+  },
+  poModal() {
+    modal('Add a purchase order', `<div class="grid g2">
+      <div class="f c4"><label>Contractor</label><select id="pc">${D.contractors.map(c => `<option value="${c.id}">${esc(c.name)}</option>`).join('')}</select></div>
+      <div class="f"><label>Category</label><select id="pcat">${Object.keys(CATS).map(k => `<option>${k}</option>`).join('')}</select></div>
+      <div class="f"><label>Event</label><select id="pev"><option>2027</option><option>2026</option></select></div>
+      <div class="f c4"><label>Description</label><input id="pd" placeholder="e.g. Car park trackway – Ploughing 2027"></div>
+      <div class="f"><label>Value (€, ex VAT)</label><input id="pv" type="number" placeholder="0"></div></div>
+      <p class="small muted">The contractor sees the PO in their portal straight away and can invoice against it.</p>`,
+      `<button class="btn" onclick="A.close()">Cancel</button><button class="btn pri" onclick="A.savePO()">${ic('check')}Add PO</button>`);
+    $('#pc').onchange = e => { $('#pcat').value = con(e.target.value).cat; }; $('#pcat').value = D.contractors[0].cat;
+  },
+  savePO() {
+    const v = +$('#pv').value, d = $('#pd').value.trim(), ev = +$('#pev').value, cid = $('#pc').value;
+    if (!v || !d) return toast('Add a description and value');
+    const n = D.pos.filter(p => p.event === ev).length + (ev === 2027 ? 13 : 200), id = `PO${String(ev).slice(2)}-${String(n).padStart(4, '0')}`;
+    D.pos.push({ id, c: cid, cat: $('#pcat').value, event: ev, desc: d, value: v, prior: 0, raised: TODAY });
+    save(); A.close(); toast(`${id} added and shared with ${con(cid).name}`); render();
+  },
+  inviteModal() {
+    modal('Invite a contractor or creditor', `<div class="grid g2">
+      <div class="f c4"><label>Company name</label><input id="in" placeholder="e.g. Kildare Fencing Ltd"></div>
+      <div class="f"><label>Contact name</label><input id="ic"></div><div class="f"><label>Email</label><input id="ie" type="email"></div>
+      <div class="f"><label>Type</label><select id="it"><option>Contractor</option><option>Creditor</option></select></div>
+      <div class="f"><label>Category</label><select id="icat">${Object.keys(CATS).map(k => `<option>${k}</option>`).join('')}</select></div></div>
+      <p class="small muted">They get an email to set a password, then they can upload invoices against their POs.</p>`,
+      `<button class="btn" onclick="A.close()">Cancel</button><button class="btn pri" onclick="A.invite()">${ic('send')}Send invite</button>`);
+  },
+  invite() {
+    const n = $('#in').value.trim(), e = $('#ie').value.trim();
+    if (!n || !e) return toast('Add the company name and email');
+    D.contractors.push({ id: 'x' + Date.now(), name: n, type: $('#it').value, cat: $('#icat').value, contact: $('#ic').value.trim() || 'Accounts', email: e, phone: '', bk: n.slice(0, 3).toUpperCase() + '0' + (D.contractors.length + 30), portal: 'invited' });
+    save(); A.close(); toast(`Invite sent to ${e}`); render();
+  },
+  emailIn() { modal('Invoices by email', `<p style="margin-top:0">Creditors who don't log in can email a PDF to <b>invoices@npa-portal.ie</b>. It's matched to the creditor by their email address and lands in this inbox as <b>New</b>, with the same checks.</p><p class="small muted">Wireframe: the address isn't live.</p>`, `<button class="btn pri" onclick="A.close()">OK</button>`); },
+  csv() {
+    const rows = [['Invoice', 'Contractor', 'Account', 'PO', 'Category', 'Nominal', 'Event', 'Date', 'Net', 'VAT', 'Total', 'Status']].concat(D.invoices.map(i => [i.no, con(i.c).name, con(i.c).bk, i.po, i.cat, CATS[i.cat].code, i.event, i.date, i.net.toFixed(2), vatOf(i).toFixed(2), total(i).toFixed(2), ST[i.status]]));
+    dl('npa-invoices.csv', rows);
+  },
+  costCsv() {
+    const rows = [['Category', 'Nominal', 'Budget holder', 'Budget', 'Approved', 'Waiting for approval', 'Paid', 'Left']].concat(Object.keys(CATS).map(k => { const s = spend(k, costEv); return [k, CATS[k].code, CATS[k].holder, s.budget, s.spent.toFixed(2), s.pending.toFixed(2), s.paid.toFixed(2), (s.budget - s.spent - s.pending).toFixed(2)]; }));
+    dl(`npa-costs-${costEv}.csv`, rows);
+  },
+  // contractor side
+  pick() {
+    const c = con(D.as), smp = SAMPLE[c.id] || ['INV-001', D.pos.find(p => p.c === c.id)?.id, 1000, 'Services'];
+    const p = A.prePO && po(A.prePO)?.c === c.id ? A.prePO : smp[1]; A.prePO = null;
+    up = { reading: true, file: `${smp[0]}.pdf` }; render();
+    setTimeout(() => { up = { file: `${smp[0]}.pdf`, no: smp[0], date: TODAY, po: p, net: smp[2], vat: 23, desc: smp[3], ai: ['no', 'date', 'po', 'net', 'desc'], support: '' }; render(); }, 1300);
+  },
+  unpick() { up = null; render(); },
+  up(k, v) {
+    up[k] = v; up.ai = up.ai.filter(x => x !== k);
+    if (k === 'po' || k === 'vat') return render();
+    const t = $('#uptot'); if (t) t.value = money((+up.net || 0) * (1 + (+up.vat) / 100));
+    const p = po(up.po), c = con(D.as);
+    $('#upwarn').innerHTML = upWarn(up, p ? p.value - poBilled(p) : 0, D.invoices.some(i => i.c === c.id && i.no.toLowerCase() === String(up.no).trim().toLowerCase() && live(i)));
+  },
+  support() { up.support = 'Timesheet-' + (up.no || 'invoice') + '.pdf'; render(); },
+  submitInv() {
+    const s = up;
+    if (!String(s.no).trim() || !(+s.net > 0) || !s.date) return toast('Add the invoice number, date and amount');
+    const p = po(s.po), i = { id: D.nextId++, c: D.as, no: String(s.no).trim(), date: s.date, po: s.po, net: +s.net, vat: +s.vat, desc: s.desc || 'Services', status: 'submitted', file: s.file, cat: p.cat, event: p.event,
+      hist: [{ at: TODAY, who: 'contractor', text: 'Invoice uploaded through the portal' + (s.support ? ' with a timesheet' : '') }], msgs: [], approvals: [] };
+    D.invoices.push(i); save(); up = null; A.justSent = i.id; go('c/inv/' + i.id);
+  },
+};
+function dl(name, rows) {
+  const csv = rows.map(r => r.map(v => /[",\n]/.test(String(v)) ? `"${String(v).replace(/"/g, '""')}"` : v).join(',')).join('\n');
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' })); a.download = name; a.click(); toast(name + ' downloaded');
+}
+
+// ---------- router ----------
+const ROUTES = [
+  [/^$/, vLanding],
+  [/^npa\/overview$/, vOverview], [/^npa\/inbox$/, vInbox], [/^npa\/approvals$/, vApprovals], [/^npa\/inv\/(\d+)$/, vInvoiceNpa],
+  [/^npa\/costs$/, vCosts], [/^npa\/pos$/, vPOs], [/^npa\/creditors$/, vCreditors], [/^npa\/settings$/, vSettings],
+  [/^c\/home$/, vCHome], [/^c\/upload$/, vCUpload], [/^c\/invoices$/, vCInvoices], [/^c\/inv\/(\d+)$/, vCInvoice], [/^c\/pos$/, vCPOs],
+];
+let lastPath = null;
+function render() {
+  const path = location.hash.replace(/^#\/?/, '');
+  for (const [re, fn] of ROUTES) {
+    const m = path.match(re);
+    if (m) {
+      document.body.classList.toggle('landing', !path);
+      document.title = !path ? 'NPA Invoice Portal' : path.startsWith('npa') ? 'NPA Finance · Invoices & costs' : 'NPA Supplier Portal';
+      const y = scrollY; $('#app').innerHTML = fn(...m.slice(1));
+      if (path === lastPath) scrollTo(0, y); else scrollTo(0, 0);
+      lastPath = path; return;
+    }
+  }
+  location.hash = '#/';
+}
+addEventListener('hashchange', () => { A.close(); render(); });
+addEventListener('storage', e => { if (e.key === KEY) { try { D = JSON.parse(e.newValue) || seed(); } catch {} render(); } });
+render();
+</script>
+</body>
+</html>
